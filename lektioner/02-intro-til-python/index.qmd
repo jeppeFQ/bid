@@ -1,0 +1,36 @@
+---
+title: "Intro til Python"
+lektion: 2
+date: 2026-09-18
+description: "Sådan taler I med Python: filen, terminalen og print(). Variable, typer, funktioner, metoder, lister, betingelser, løkker og fejlbeskeder."
+workshop: "Python-øvelser"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 12.30–16.15 · tid og sted i CalMoodle
+
+## Om lektionen
+
+En workshop, hvor I selv koder. Vi samler op på det centrale fra lektion 1 og gennemgår de byggesten, I skal bruge i øvelserne: variable, typer, funktioner, metoder, lister, betingelser og løkker, og hvordan man læser en fejlbesked.
+
+## Workshop
+
+Python-øvelser i VS Code. Øvelsesfilerne ligger på Moodle.
+
+## Forberedelse og litteratur
+
+Ingen ny litteratur. Kom med Python installeret på jeres maskine.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

@@ -1,0 +1,43 @@
+---
+title: "Computere, algoritmer og Python"
+lektion: 1
+date: 2026-09-15
+description: "Hvad er en computer, og hvad er kode? Hardware, Moore's lov, bits og bytes, og hvorfor vi skriver kode frem for at klikke."
+workshop: "Installation af Python og introduktion til kommandolinjen"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Studieordningen for modulet og kursusbeskrivelsen"
+  - "Kernighan (2021), kap. 1, 2 og 3"
+  - "Downey (2024): forordet, og orientér jer i bogen"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 08.15–12.00 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Kursusgangen introducerer modulet, dets læringsmål, struktur, litteratur og arbejdsform. Vi taler om computerens udvikling og dens samfundsmæssige betydning, med særligt fokus på hardware og Moore's lov. Dertil får vi alt det praktiske på plads: download og opsætning af det software, der bruges på kurset.
+
+## Workshop
+
+Opsætning af nødvendig software. Introduktion til programmeringsmiljøet og jeres første lille program (*Hello World!*).
+
+## Forberedelse og litteratur
+
+- Studieordningen for modulet og kursusbeskrivelsen (se Moodle).
+- Kernighan (2021): *Understanding the Digital World*, kapitel 1, 2 og 3.
+- Downey (2024): *Think Python*. Læs forordet, og orientér jer i bogen. Vi installerer Python sammen, så I skal ikke lave øvelser i bogen endnu.
+- AAU's guide til installation af Python (på Moodle).
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

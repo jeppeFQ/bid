@@ -1,0 +1,38 @@
+---
+title: "TITEL PÅ LEKTIONEN"
+lektion: 99                # nummeret, der vises i listerne (og sorteres efter)
+date: 2027-09-01
+description: "Én sætning om, hvad lektionen handler om. Vises på forsiden og i planen."
+workshop: "Navn på dagens workshop"
+status: kommer             # klar | kommer | anden | moodle
+slides: true               # true, når slides.qmd er klar (viser slides-links i listerne)
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:                # kort form; vises i lektionsplanen
+  - "Forfatter (år), kap. X"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · tid og sted i CalMoodle
+
+## Om lektionen
+
+Et par linjer om indholdet.
+
+## Workshop
+
+Hvad I arbejder med i workshoppen.
+
+## Forberedelse og litteratur
+
+- Fuld henvisning med link.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

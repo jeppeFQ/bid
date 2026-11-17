@@ -1,0 +1,579 @@
+---
+title: "Plain text, compilere og markup"
+subtitle: "Lektion 09"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: lilla
+---
+
+## I dag
+
+1. **Plain text.** Det enkleste format, der findes, og hvorfor det holder.
+2. **Compilere.** Fra det, mennesker skriver, til det, maskiner gør.
+3. **Markup.** Tekst om tekst.
+4. **Fra .qmd til hjemmeside.**
+5. **Workshop:** barometerets hjemmeside.
+
+## Det, I allerede ved
+
+| Fra | Det, vi bruger i dag |
+|---|---|
+| Lektion 1 | Alt er tal. Også tekst |
+| Lektion 3 | Git kan vise, præcis hvad der er ændret i tekstfiler |
+| Lektion 4 | Kernighans lag: hvert lag kender kun grænsefladen til laget under |
+| Lektion 5 og 6 | `README.md`, `DESIGN.md` og `om.md`, I har skrevet Markdown hele semestret |
+| Lektion 8 | SQL og JSON er også bare tekst |
+
+# Plain text
+
+Det enkleste format, der findes, og hvorfor det holder.
+
+## Hvad er plain text?
+
+Tekst og intet andet. Ingen skjult formatering, ingen indlejrede billeder, intet program, der skal til for at åbne den.
+
+::: {.incremental}
+
+* En `.py`-fil er plain text. En `.csv` er plain text. En `.md` er plain text.
+
+* En `.docx` er **ikke**. Heller ikke en `.pages` eller en `.xlsx`.
+
+* Plain text kan åbnes af ethvert program på enhver computer ... i dag og om 30 år.
+
+:::
+
+## Tekst er tal {.kodelab}
+
+Første princip fra lektion 1. Hvert tegn er gemt som et tal:
+
+:::: {.proev gaet="Hvor mange tal bliver \"æøå\" til?" valg="3|6|9"}
+```{pyodide}
+tekst = "Om barometeret"
+
+print(list(tekst.encode("utf-8")))
+print(len(tekst), "tegn")
+
+print(list("æøå".encode("utf-8")))
+```
+
+::: {.forklaring}
+1. {1} En almindelig tekst på fjorten tegn.
+2. {3} `.encode("utf-8")` laver teksten om til de tal (bytes), der står i filen. `list()` viser dem som en liste.
+3. {4} `len()` tæller tegn, ikke bytes.
+4. {6} De tre danske bogstaver.
+:::
+::::
+
+::: {.fragment}
+Fjorten tegn, fjorten tal. Men **æ**, **ø** og **å** fylder to tal hver. Tegnsættet hedder UTF-8, og det er grunden til, at danske bogstaver kan blive til `Ã¦` og `Ã¸`, når et program læser filen med det forkerte.
+:::
+
+## Skriv selv
+
+Skriv et ord med **æ**, **ø** eller **å**. Hvad sker der med rækken *Bits*?
+
+::: {.figur figur="tegn" tekst="Århus"}
+:::
+
+::: {.lille}
+Hvert tegn har ét tal (kodepunktet). UTF-8 gemmer tallet i én byte (8 bits), hvis det er lille nok, og ellers i flere. Derfor fylder **æ**, **ø** og **å** to.
+:::
+
+## En Word-fil er ikke tekst
+
+Opvarmningsarket fra lektion 6 er to sider i Word. Pakker man det ud, ser det sådan ud:
+
+```
+word/document.xml            79.664 byte    selve teksten, gemt i XML
+word/styles.xml               4.409 byte    skrifttyper og formater
+word/numbering.xml            3.172 byte    nummererede lister
+word/_rels/document.xml.rels  1.057 byte    hvad der hænger sammen med hvad
+docProps/core.xml               643 byte    forfatter, dato
+[Content_Types].xml           2.104 byte    hvilke slags filer der er med
+_rels/.rels                     718 byte
+```
+
+::: {.fragment}
+En `.docx` er en **zip-fil med elleve filer**. Teksten er der, men begravet i maskinlæsbar [markup]{.ord}. Man kan ikke se, hvad der er ændret mellem to udgaver, kun at noget er.
+:::
+
+## Hvorfor plain text?
+
+Kieran Healy, *The Plain Person's Guide to Plain Text Social Science*:
+
+::: {.incremental}
+
+* **Det holder.** Formatet forældes ikke. Programmet kan forsvinde; teksten kan stadig læses.
+
+* **Alle værktøjer kan bruge det.** Python, Git, pandoc, Quarto og enhver *editor*.
+
+* **Man kan se, hvad der er ændret.** Linje for linje.
+
+* **Indhold og udseende er adskilt.** Man skriver *hvad*, og et program bestemmer *hvordan* det skal se ud.
+
+:::
+
+## Git kan se forskellen {.kodelab}
+
+:::: {.proev forslag="Ret også overskriften i `efter`. Hvad viser forskellen nu?"}
+```{pyodide}
+import difflib
+
+foer = """## Hvad barometeret kan
+Barometeret er til HR-medarbejdere.
+Det viser tre tal.""".splitlines()
+
+efter = """## Hvad barometeret kan
+Barometeret er til HR-medarbejdere og journalister.
+Det viser tre tal og aldrig bare ét.""".splitlines()
+
+for linje in difflib.unified_diff(foer, efter, "om.md (før)", "om.md (efter)", lineterm=""):
+    print(linje)
+```
+
+::: {.forklaring}
+1. {1} `difflib` er Pythons modul til at sammenligne tekster.
+2. {3-5} Første udgave af `om.md`, delt op i linjer med `.splitlines()`.
+3. {7-9} Anden udgave: to af linjerne er ændret.
+4. {11-12} `unified_diff` finder forskellen linje for linje og skriver den ud i samme form som `git diff`.
+:::
+::::
+
+::: {.lille}
+Det er præcis det, `git diff` viser. Linjer med `-` er fjernet, linjer med `+` er tilføjet. Det kan kun lade sig gøre, fordi filen er tekst.
+:::
+
+# Compilere
+
+Fra det, mennesker skriver, til det, maskiner gør.
+
+## Fra menneske til maskine
+
+Kernighan kapitel 5: processoren fra lektion 1 kan kun en håndfuld simple instruktioner: hent et tal, læg to tal sammen, gem resultatet.
+
+:::: {.to-kol}
+::: {.kol}
+- Ingen skriver programmer i de instruktioner. Vi skriver i **højniveausprog** som Python.
+- En **[compiler]{.ord}** oversætter fra højniveausproget til maskinens instruktioner, *før* programmet kører.
+- En **fortolker** (*interpreter*) oversætter og udfører *undervejs*, linje for linje.
+:::
+
+::: {.figur figur="lag" retur="nej" start="Det, vi skriver, står øverst." lag="Højniveausprog|Python: det, mennesker skriver;Compiler eller fortolker|oversætter;Maskinens instruktioner|hent, regn, gem"}
+:::
+::::
+
+## Python kan vise sin oversættelse {.kodelab}
+
+:::: {.proev}
+```{pyodide}
+import dis
+
+def andel(antal, i_alt):
+    return antal / i_alt
+
+dis.dis(andel)
+```
+
+::: {.forklaring}
+1. {1} `dis` (*disassembler*) viser den oversættelse, Python laver.
+2. {3-4} `andel` fra lektion 4.
+3. {6} Vis oversættelsen af funktionen.
+:::
+::::
+
+::: {.fragment}
+`andel` fra lektion 4, oversat: hent `antal`, hent `i_alt`, del dem, returnér. Det er tæt på den lille computer i lektion 1. (Detaljerne afhænger af Python-versionen.)
+:::
+
+## Hvad står der?
+
+Python har oversat `andel` til fire instruktioner. Læs dem oppefra og ned:
+
+| Linje | Instruktion | Det betyder |
+|---|---|---|
+| 3 | `RESUME` | Python gør sig klar til at køre funktionen. Den gør ikke noget, man kan se |
+| 4 | `LOAD_FAST_LOAD_FAST (antal, i_alt)` | Hent de to tal, funktionen fik med, og læg dem klar |
+| | `BINARY_OP 11 (/)` | Tag de to tal, og del det ene med det andet |
+| | `RETURN_VALUE` | Giv resultatet tilbage til den, der kaldte |
+
+::: {.incremental}
+* **Tallene til venstre** er linjenumrene i cellen: `def` står på linje 3, `return` på linje 4. Én linje Python blev til tre instruktioner.
+* **Tallene i midten** (`1` og `11`) er Pythons egne koder. `11` betyder division. Dem behøver man ikke kunne.
+* **Hent, regn, giv tilbage.** Det er præcis, hvad den lille computer i lektion 1 kunne: hente et tal, regne med det og gemme resultatet.
+:::
+
+## En anden Python, en anden oversættelse
+
+Kører I cellen på en anden Python-version, ser oversættelsen lidt anderledes ud. Ældre udgaver henter de to tal med to instruktioner i stedet for én.
+
+::: {.fragment}
+Det gør ikke noget: **grænsefladen** `andel(antal, i_alt)` er den samme. Kun implementationen under den er ændret. Det er lektion 4 igen.
+:::
+
+## Dokumenter kan også oversættes
+
+En compiler oversætter ét sprog til et andet. Det gælder ikke kun programmer.
+
+::: {.incremental}
+
+* **pandoc** oversætter mellem dokumentformater: Markdown til HTML, Word, PDF og mange flere. Healy kalder det et af de vigtigste værktøjer i sin værktøjskasse.
+
+* **Quarto** bygger oven på pandoc og kan desuden køre kode undervejs.
+
+* **Disse slides** er skrevet i plain text og oversat til den hjemmeside, I kigger på nu.
+
+:::
+
+# Markup
+
+Tekst om tekst.
+
+## Tekst om tekst
+
+**Markup** er tegn i teksten, der fortæller noget *om* teksten: at noget er en overskrift, at noget skal være fed, at noget er et link.
+
+| Det, der skal stå | HTML | Markdown |
+|---|---|---|
+| en overskrift | `<h2>Opslag</h2>` | `## Opslag` |
+| **fed** | `<strong>fed</strong>` | `**fed**` |
+| *kursiv* | `<em>kursiv</em>` | `*kursiv*` |
+| et link | `<a href="om.html">Om</a>` | `[Om](om.qmd)` |
+| et punkt | `<li>Handel</li>` | `- Handel` |
+
+## Skriv selv: fra Markdown til skærm
+
+Ret i Markdown-teksten til venstre. Den midterste kolonne er den HTML, maskinen får. Den højre er det, browseren viser.
+
+::: {.figur figur="markup"}
+:::
+
+## HTML {.kodelab}
+
+Kernighan kapitel 10: en hjemmeside er en tekstfil med **HTML** (*HyperText Markup Language*). Browseren læser markuppen og bestemmer, hvordan det skal se ud.
+
+:::: {.proev}
+```{pyodide}
+medianer = {"Sundhed og socialvæsen": 79.0, "Handel": 45.4, "Bygge og anlæg": 10.8}
+
+html = "<table>\n  <tr><th>Branche</th><th>Kvinder</th></tr>\n"
+for branche, median in medianer.items():
+    html = html + f"  <tr><td>{branche}</td><td>{median} %</td></tr>\n"
+html = html + "</table>"
+
+print(html)
+```
+
+::: {.forklaring}
+1. {1} Tre medianer fra sidste lektion, i procent.
+2. {3} Start tabellen: `<table>` og en række med overskrifter (`<th>`). `\n` er et linjeskift.
+3. {4-5} Én række (`<tr>`) med to celler (`<td>`) for hver branche.
+4. {6} Luk tabellen. Næsten hvert `<…>` har en partner `</…>`, der lukker.
+5. {8} Vis HTML'en, som den står.
+:::
+::::
+
+::: {.lille}
+HTML er bare tekst. Python kan skrive den med en f-streng og det er præcis, hvad Quarto gør med jeres tabeller fra `brancher()`.
+:::
+
+## Markdown {.kodelab}
+
+HTML er til maskiner. **Markdown** er til mennesker: markup, der ser ud som almindelig tekst, også før den er oversat.
+
+:::: {.proev}
+```{pyodide}
+md = "| Branche | Kvinder |\n|---|---|\n"
+for branche, median in medianer.items():
+    md = md + f"| {branche} | {median} % |\n"
+
+print(md)
+```
+
+::: {.forklaring}
+1. {1} Overskriftsrækken og stregen under den. Bruger `medianer` fra cellen før.
+2. {2-3} Én linje for hver branche, med `|` mellem cellerne.
+3. {5} Vis Markdown-teksten, som den står.
+:::
+::::
+
+::: {.fragment}
+Samme tabel, halvt så mange tegn og man kan (nogenlunde) læse den, som den står. Markdown blev opfundet med netop det mål.
+:::
+
+## Markdown på én side
+
+:::: {.to-kol}
+::: {.kol}
+```markdown
+# Overskrift
+## Underoverskrift
+
+**fed** og *kursiv*
+
+- et punkt
+- et punkt mere
+
+1. første
+2. anden
+
+[et link](om.qmd)
+
+`kode i teksten`
+```
+:::
+
+::: {.kol}
+````markdown
+| Branche | Kvinder |
+|---|---|
+| Handel | 45,4 % |
+
+```python
+print("en kodeblok")
+```
+
+> et citat
+
+::: {.callout-note}
+En boks — kun i Quarto
+:::
+````
+:::
+::::
+
+::: {.lille}
+I VS Code og Positron viser `Ctrl + Shift + V` (`⌘ + Shift + V` på Mac) en forhåndsvisning af en Markdown-fil.
+:::
+
+## YAML
+
+Øverst i en `.qmd`-fil og i `_quarto.yml` står **YAML**: indstillinger skrevet som `nøgle: værdi`.
+
+```yaml
+website:
+  title: "Diversitetsbarometeret"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Forside
+```
+
+::: {.incremental}
+
+* **Indrykningen er grammatik.** To mellemrum ind betyder "hører til linjen over". Det er samme princip som i Python.
+
+* **Efter et kolon kommer et mellemrum.** `text:Forside` er en fejl. `text: Forside` er rigtigt.
+
+:::
+
+## CSS
+
+Markup siger *hvad* noget er. **CSS** siger, *hvordan* det skal se ud.
+
+```css
+h2 { color: #1f5fbf; }
+```
+
+::: {.fragment}
+Det er lagene fra lektion 4 igen. Indholdet ved ikke, hvordan det ser ud; udseendet ved ikke, hvad indholdet siger. Man kan skifte det ene ud uden at røre det andet. Et tema i Quarto er bare en færdig CSS-fil.
+:::
+
+# Fra .qmd til hjemmeside
+
+Quarto er en compiler for dokumenter.
+
+## Quarto er en compiler for dokumenter
+
+Tryk *Næste trin*, og følg filen.
+
+::: {.figur figur="kaede" led=".qmd|Markdown + Python|Jupyter kører koden;.md|Markdown + resultater|pandoc oversætter;.html|en side|tema og CSS;_site/|hjemmesiden|"}
+:::
+
+::: {.incremental}
+* Python-koden kører **én gang**, når siden bygges. Den, der læser siden, kører ingen Python.
+* Resultatet (tabeller, figurer) står i HTML'en, som om det var skrevet.
+* `_site/` er **resultatet**, ikke kilden.
+:::
+
+## Siderne i barometeret
+
+En hjemmeside i Quarto er en mappe:
+
+```
+_quarto.yml      navigationen, temaet, hvilke sider der findes
+
+index.qmd        Forside         I skriver den
+barometer.qmd    Barometer       et eksempel på figuren
+opslag.qmd       Opslag          tabeller og figurer fra brancher()
+om.qmd           Om              henter app/om.md
+```
+
+::: {.fragment}
+Byg og se den, mens I arbejder:
+
+```bash
+quarto preview
+```
+:::
+
+## Den samme kode, et nyt lag
+
+`opslag.qmd` laver ingen beregninger selv. Den kalder de funktioner, I læste i lektion 6:
+
+````markdown
+```{{python}}
+from app.barometer import Referencetal
+from app.barometer.opslag import brancher
+from app.barometer.figur import tegn_opslag
+
+referencetal = Referencetal()
+```
+
+```{{python}}
+figur = tegn_opslag(brancher(referencetal, "kvinder"))
+```
+````
+
+## Én tekst, to steder
+
+`om.qmd` er kun tre linjer:
+
+```markdown
+---
+pagetitle: "Om barometeret"
+---
+
+{{</* include app/om.md */>}}
+```
+
+::: {.incremental}
+
+* Om-siden i appen og Om-siden på hjemmesiden er **den samme fil**.
+
+* Retter man den ét sted, er den rettet begge steder.
+
+* Det er samme idé som opslagstabellerne i lektion 5: noget, der skal være ens, skal kun stå ét sted.
+
+:::
+
+# Workshop
+
+Barometerets hjemmeside.
+
+## Før I starter
+
+[10 min]{.timer tid=600}
+
+**Sync fork** og `git pull`. Så får I `_quarto.yml`, `barometer.qmd`, `opslag.qmd` og `om.qmd`, og en `index.qmd` med kommentarer, I skal skrive om.
+
+::: {.incremental}
+
+* **Positron** har Quarto indbygget. **VS Code** skal have Quarto installeret fra quarto.org og udvidelsen *Quarto*.
+
+* Quarto skal kunne køre Python. Tjek det i terminalen:
+
+  ```bash
+  quarto check jupyter
+  ```
+
+  Mangler Jupyter, så:  `python -m pip install jupyter`
+
+:::
+
+## Øvelse 1: Markdown på ti minutter
+
+[10 min]{.timer tid=600}
+
+Lav en fil, `kladde.md`, og genskab teksten fra arket — overskrifter, fed og kursiv, en liste, et link og en tabel.
+
+Åbn forhåndsvisningen ved siden af med `Ctrl + Shift + V`, og ret, til de ser ens ud.
+
+## Øvelse 2: Forsiden
+
+[20 min]{.timer tid=1200}
+
+Åbn `index.qmd`, og skriv forsiden. Kommentarerne siger, hvad der skal stå hvor.
+
+::: {.incremental}
+
+* **Hvad barometeret kan**: to eller tre sætninger, med det vigtigste ord i **fed**
+
+* **Tre sider**: en liste med et link til hver
+
+* **Det, barometeret ikke gør**: de vigtigste beslutninger fra `KOEREPLAN.md`
+
+:::
+
+::: {.fragment}
+Kør `quarto preview` i terminalen. Siden opdaterer sig selv, hver gang I gemmer.
+:::
+
+## Øvelse 3: Opslag og Barometer
+
+[20 min]{.timer tid=1200}
+
+Koden står der allerede. Mangler der noget, er det **teksten**.
+
+::: {.incremental}
+
+* `opslag.qmd`: forklar, hvordan man læser figuren — hvad er søjlen, hvad er prikken? Og hvad er en median, og hvad er den ikke?
+
+* `barometer.qmd`: forklar figuren med jeres egne ord — det lyse bånd, det mørke bånd, stregen og trekanten.
+
+:::
+
+## Øvelse 4: Navigationen og udseendet
+
+[15 min]{.timer tid=900}
+
+Åbn `_quarto.yml`.
+
+::: {.incremental}
+
+1. Byt om på rækkefølgen af to sider i menuen. Gem, og se det skifte.
+
+2. Skift temaet fra `cosmo` til et af Quartos andre: fx `flatly`, `litera` eller `minty`.
+
+3. Ret teksten i bunden af siden, så den nævner jeres gruppe.
+
+4. Lav en fejl med vilje: fjern mellemrummet efter et kolon. Hvad siger Quarto? Ret den igen.
+
+:::
+
+## Når det driller
+
+| Det, I ser | Det betyder |
+|---|---|
+| `quarto: command not found` | Quarto er ikke installeret. Positron har det indbygget; ellers quarto.org |
+| `Jupyter is not available` | `python -m pip install jupyter`, og så `quarto check jupyter` |
+| `No module named 'app'` | Quarto kører ikke fra roden af repositoriet |
+| `YAML parse exception` | Indrykning, et manglende mellemrum efter kolon, eller `---` med tekst lige under |
+| Om-siden er tom | `app/om.md` mangler, eller stien i `include` er forkert |
+| `_site/` står i `git status` | `.gitignore` er blevet ændret. Den skal stå der |
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+Plain text holder, kan læses af alle værktøjer og viser, hvad der er ændret. Quarto oversætter den til en hjemmeside, ligesom en compiler oversætter kode.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Gør forsiden og de to sider færdige. Commit og push, inden I går.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion 10: Chatbots, NLP og ChatGPT](../10-chatbots-nlp-og-chatgpt/index.html). Skim *Tænker sprogmodeller?*
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

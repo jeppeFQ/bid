@@ -1,0 +1,653 @@
+---
+title: "Softwaredesign"
+subtitle: "Lektion 05"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: gul
+pyodide:
+  packages:
+    - pandas
+---
+
+## I dag
+
+1. **Opsamling** på jeres design fra sidste gang.
+2. **Køreplanen.** Fra i dag bygger vi det samme.
+3. **Design er oversættelse.** Fra kundens beskrivelse til klasser og metoder.
+4. **Værktøjerne.** Klassediagram og sekvensdiagram.
+5. **Virksomheden som objekt.** Hvad en arbejdsplads *er*, og hvad den *kan*.
+6. **Workshop:** videre arbejde med mini-projektet.
+
+## Litteraturen, og hvor den bruges
+
+| Kapitel | Bruges til |
+|---|---|
+| **Downey kap. 14:** *Classes and Functions* | Egne typer, rene funktioner og modifiers, og hvornår man planlægger frem for at prøve sig frem |
+| **Downey kap. 15:** *Classes and Methods* | Metoder, `__init__`, `__str__`, polymorfi, og grænseflade og implementation igen |
+| **Downey kap. 16:** *Classes and Objects* | Objekter, der indeholder andre objekter, og hvad der sker, når man kopierer dem |
+
+# Opsamling
+
+Fem ting fra jeres design, der går direkte videre.
+
+## Fem ting, der går direkte videre
+
+::: {.incremental}
+- *"Skal ikke fortælle kausalitet, brugeren skal selv forholde sig til dataen."*
+- *"Compound info: så køn og løn samlet (én gruppe ad gangen)."*
+- *"CVR. Adresse. Virksomhedens navn."* På listen over det, barometeret ikke må sige.
+- *"Stadigvæk vise data fra andre virksomheder"*, selvom brugeren ikke har tastet sine egne tal ind.
+- *"Se på den historiske udvikling":* 2012 mod 2022.
+:::
+
+## "Skal ikke fortælle kausalitet"
+
+- Barometeret kan se, at andelen er lav. Det kan **ikke** se hvorfor.
+- Rapporten kan vise, at geografien hænger sammen med andelen med indvandrerbaggrund. Den kan ikke sige, at den ene ting forårsager den anden.
+- Et værktøj, der blander de to ting sammen, bliver brugt som en dom.
+
+## "Én gruppe ad gangen"
+
+- Jo flere ting man krydser, jo færre arbejdspladser er der tilbage i hver celle.
+- *Kvinder i industrien* er mange. *Kvinder i industrien, i Nordjylland, i små private virksomheder, over 55 år* er måske tre personer.
+- **Så kan man genkende dem.** Også selvom der aldrig stod et navn nogen steder.
+
+::: {.lille}
+Det er den samme regel, Danmarks Statistik bruger, når de beslutter, hvad der må offentliggøres.
+:::
+
+## {.udsagn}
+
+"Vis stadig de **andres** tal."
+
+Også når brugeren ikke har tastet sine egne ind.
+
+## Løn: et ønske fra kunden
+
+- **Rapporten måler ikke løn.** Den måler, hvem der er ansat, ikke hvad de tjener.
+- Et barometer kan kun svare på det, der står i tallene bag det.
+- Og viser man alligevel noget, der *ligner* et svar, så tror brugeren på det.
+
+::: {.lille}
+Det er forskellen på et **ønske** og et **krav**. Det skal med på *Om*-siden som noget, barometeret ikke kan.
+:::
+
+## CVR og navn: to grupper, to svar
+
+:::: {.to-kol}
+::: {.kol}
+En gruppe satte CVR, adresse og virksomhedens navn på listen over det, barometeret **ikke** må vise.
+:::
+
+::: {.kol}
+En anden gruppe satte CVR og navn ind som noget, `Arbejdsplads` skulle **vide**.
+:::
+::::
+
+::: {.fragment}
+- Begge dele kan forsvares, hvis man ved, hvad man vælger.
+- Skal barometeret **gemme** noget, man kan genkende en arbejdsplads på? Nej. Så kan det lækkes.
+- Må man **taste** sit navn ind for sin egen skyld? Måske. Men hvad bruger systemet det til?
+:::
+
+::: {.fragment}
+**Kunden siger nej til begge dele.** Barometeret har ikke brug for at vide, hvem I er.
+:::
+
+## Andre svar fra grupperne
+
+- Ingen enkelte arbejdspladser må kunne genkendes.
+- Det skal kunne bruges uden at installere noget.
+- Man skal også kunne slå tal op uden at taste noget ind.
+- Det skal være til at forstå for en, der ikke har læst rapporten.
+- *Modtag arbejdspladsens tal → find de sammenlignelige → placér arbejdspladsen → tegn det → forklar det → slå op uden at taste.*
+
+## En sætning, kunden kan sige ja til
+
+To ønsker, kunden sagde nej til:
+
+- *"Kan man se, hvilke virksomheder der ligger dårligst?"*
+- *"Det skal også virke for min vens firma med 12 ansatte."*
+
+::: {.fragment}
+> "Vi bygger en hjemmeside, som gør det muligt for en HR-medarbejder på en arbejdsplads med mindst 50 ansatte at se, hvor arbejdspladsen ligger på tre andele i forhold til sammenlignelige arbejdspladser. Vi bygger ikke en rangliste, og vi viser ikke enkelte arbejdspladser."
+:::
+
+## Første bud på kode: find fejlene
+
+Fire fejl i seks linjer. Kan I finde dem, før de bliver vist?
+
+```python
+def andel(antal, i alt):          # 1
+    ...
+
+antal_ansatte = int(input("Hvor mange ansatte har virksomheden? "))
+antal_ansatte = 50                # 2
+
+if antal_ansatte < 0 orantal_kvinder > antal_ansatte:    # 3
+print("Indtast gyldige tal.")     # 4
+```
+
+::: {.incremental}
+1. **Mellemrum i et navn.** `i alt` er to ord. Python ser et navn, der stopper.
+2. **Linje to sletter linje et.** Brugerens svar bliver overskrevet af vores testværdi.
+3. **Et manglende mellemrum.** `orantal_kvinder` findes ikke. Fejlbeskeden peger på `or`.
+4. **Manglende indrykning.** `print` står ikke inde i `if`.
+:::
+
+## Linje to sletter linje et {.kodelab}
+
+Fejl nummer 2 er den farligste, fordi der ikke kommer nogen fejlbesked.
+
+:::: {.proev gaet="Hvad skriver Python ud?" valg="120|50|En fejl"}
+```{pyodide}
+antal_ansatte = 120      # det, brugeren tastede ind
+antal_ansatte = 50       # det, vi satte, mens vi testede
+
+print(antal_ansatte)
+```
+
+::: {.forklaring}
+1. {1} Gem 120 under navnet `antal_ansatte`. Det er det, brugeren tastede ind.
+2. {2} Gem 50 under **samme navn**. Den gamle værdi bliver smidt væk. `=` er en ordre, ikke en påstand.
+3. {4} Vis værdien. Python kan kun vise den seneste.
+:::
+::::
+
+::: {.fragment}
+Programmet kører. Det svarer bare på et andet spørgsmål, end brugeren stillede. Den slags findes kun ved at **læse sin egen kode ovenfra og ned**, eller ved at **teste med værdier, man kender svaret på**.
+:::
+
+## Den samme kode, rettet {.kodelab}
+
+Alle fire fejl er rettet, og testværdien er nu den eneste værdi.
+
+:::: {.proev forslag="Prøv med `antal_kvinder = 60`, og derefter `antal_ansatte = 40`. Hvilken besked kommer hver gang?"}
+```{pyodide}
+def andel(antal, i_alt):
+    """Beregn en andel af de ansatte."""
+    return antal / i_alt
+
+antal_ansatte = 50
+antal_kvinder = 20
+
+if antal_ansatte < 50:
+    print("Barometeret dækker kun arbejdspladser med mindst 50 ansatte.")
+elif antal_kvinder < 0 or antal_kvinder > antal_ansatte:
+    print("Indtast gyldige tal. Der kan ikke være flere kvinder end ansatte.")
+else:
+    print(f"Kvindeandel: {andel(antal_kvinder, antal_ansatte):.0%}")
+```
+
+::: {.forklaring}
+1. {1-3} Fejl 1 er rettet: `i_alt` er ét navn med en understreg.
+2. {5-6} Testværdierne. Der er ingen `input()`, så intet bliver overskrevet.
+3. {8-9} Første kontrol: barometeret dækker kun arbejdspladser med mindst 50 ansatte.
+4. {10-11} Fejl 3 er rettet: `or` står med mellemrum på begge sider. Og `print` er rykket ind under betingelsen (fejl 4).
+5. {12-13} Kun hvis begge kontroller går godt, regnes andelen ud. `:.0%` viser den som procent.
+:::
+::::
+
+::: {.lille}
+`input()` virker ikke i cellerne her i slides, kun på jeres egen maskine. Derfor er tallene skrevet ind.
+:::
+
+# Python-øvelser
+
+Tid til øvelserne.
+
+# Paradigmer vi sprang over sidste gang
+
+[Slides fra lektion 4](../04-paradigmer-og-algoritmer/slides.html), afsnittet *Paradigmer*.
+
+# Køreplanen
+
+Fra i dag bygger alle grupper det samme produkt.
+
+## Fra i dag bygger vi det samme
+
+I har hver jeres design. Det var pointen med sidste gang. Men fra i dag skal vi kunne tale om det samme, og jeg skal kunne hjælpe jer alle sammen med den samme fejl.
+
+::: {.incremental}
+- Derfor ligger der nu en `KOEREPLAN.md` i originalen. Hent den med **Sync fork**.
+- Den siger, hvad produktet er, hvilke lag det består af, og hvad klasserne hedder.
+- Alt, der **ikke** står i den, bestemmer I selv.
+:::
+
+## Produktet: fire sider
+
+| Side | Hvad den gør |
+|---|---|
+| **Forside** | Hvad barometeret er, hvem det er til, og hvad det ikke kan |
+| **Barometer** | Brugeren taster sine tal ind og ser, hvor arbejdspladsen ligger |
+| **Opslag** | Fordelingerne for brancher, størrelser og regioner, uden at taste noget ind |
+| **Om** | Data, definitioner, begrænsninger, og hvad barometeret ikke må bruges til |
+
+Alt sammen bygget med Quarto og lagt på GitHub Pages fra jeres egen fork.
+
+## Skærmbilledet: ind og ud
+
+:::: {.to-kol}
+::: {.kol}
+**Brugeren taster ind**
+
+- Branche, sektor, region
+- Antal ansatte
+- Heraf kvinder
+- Heraf 55 år eller derover
+- Heraf med indvandrerbaggrund
+:::
+
+::: {.kol}
+**Brugeren får**
+
+- Tre placeringer, én pr. dimension
+- En figur med tre paneler
+- En kort forklaring i ord
+- Besked, hvis gruppen måtte gøres bredere
+- Besked, hvis der er under 50 ansatte
+:::
+::::
+
+::: {.fragment}
+**Aldrig ét samlet tal.** Det står i køreplanen, fordi det er den eneste beslutning, rapporten træffer for os.
+:::
+
+## Arkitekturen: fire lag
+
+Hvert lag taler kun med laget lige under. Tryk *Næste trin*, og følg en forespørgsel fra brugeren.
+
+::: {.figur figur="lag" retur="ja" lag="Siden|Quarto og appen: det, brugeren ser;Appen|app.py læser felterne og viser svaret;Kernen|mappen barometer/ med alle klasserne;Data|referencetal.csv: aggregerede tal fra Danmarks Statistik" start="Brugeren taster sine tal ind på siden." slut="Svaret kommer tilbage gennem de samme lag og bliver vist på siden."}
+:::
+
+## Klasserne: hvad de ved, og hvad de kan
+
+| Klasse | Ved | Kan |
+|---|---|---|
+| `Arbejdsplads` | ansatte, antal i hver gruppe, branche, sektor, region | `andel(dimension)`, `stoerrelsesgruppe` |
+| `Referencetal` | alle referencetallene | `find(arbejdsplads, dimension)`, `muligheder(kolonne)` |
+| `Referencegruppe` | beskrivelse, antal arbejdssteder, percentiler | `median()` |
+| `Placering` | dimension, andel, referencegruppe | `interval()`, `saetning()` |
+| `Barometer` | referencetallene | `vurder(arbejdsplads)` |
+| `Resultat` | arbejdspladsen og de tre placeringer | `forklaring()`, `figur()` |
+
+::: {.lille}
+Navnene ligger fast. Indholdet er jeres.
+:::
+
+## Hvordan de hænger sammen
+
+```{mermaid}
+classDiagram
+    class Arbejdsplads {
+        +ansatte
+        +antal
+        +branche, sektor, region
+        +andel(dimension)
+        +stoerrelsesgruppe()
+    }
+    class Referencetal {
+        +find(arbejdsplads, dimension)
+        +muligheder(kolonne)
+    }
+    class Referencegruppe {
+        +beskrivelse
+        +percentiler
+        +median()
+    }
+    class Placering {
+        +dimension
+        +andel
+        +interval()
+        +saetning()
+    }
+    class Barometer {
+        +vurder(arbejdsplads)
+    }
+    class Resultat {
+        +forklaring()
+        +figur()
+    }
+    Barometer --> Referencetal : bruger
+    Barometer ..> Resultat : laver
+    Referencetal ..> Referencegruppe : laver
+    Placering --> Referencegruppe : har
+    Resultat --> Placering : har tre
+    Resultat --> Arbejdsplads : handler om
+```
+
+# Design er oversættelse
+
+Fra det, kunden siger, til det, maskinen kan udføre.
+
+## To sprog
+
+:::: {.to-kol}
+::: {.kol}
+**Naturligt sprog**
+
+Rigt, hurtigt, fuld af underforståelser.
+
+*"Sammenlign med nogle, der ligner os."*
+
+Vi forstår det med det samme. Ingen kan bygge det.
+:::
+
+::: {.kol}
+**Formelt sprog**
+
+Fattigt, langsomt, uden underforståelser.
+
+```python
+referencetal.find(arbejdsplads, "kvinder")
+```
+
+Ingen misforstår det. Heller ikke maskinen.
+:::
+::::
+
+::: {.fragment}
+**Softwaredesign er arbejdet imellem de to spalter.**
+:::
+
+## Fra sætning til kode
+
+Den klassiske fremgangsmåde i objektorienteret analyse: tag kundens beskrivelse, og del den op i sine bestanddele. Tryk *Næste trin*.
+
+::: {.figur figur="saetning" tekst="En [arbejdsplads|k] med [mindst 50|b] [ansatte|k] skal kunne [se|m], hvor den [ligger|m] på [tre|b] [andele|k] i forhold til [sammenlignelige arbejdspladser|k]."}
+:::
+
+::: {.lille}
+Fra navneordene kommer klasserne: arbejdsplads, ansat, andel, sammenligningsgruppe. Fra udsagnsordene metoderne: se, ligge, sammenligne, beregne.
+:::
+
+## Hvad oversættelsen taber
+
+::: {.incremental}
+- *"Nogle, der ligner os"* blev til branche, størrelse og sektor. Det er et **valg**. En arbejdsplads kunne ligne en anden på mange andre måder.
+- *"Hvordan vi ligger"* blev til en percentil. Endnu et **valg**. Det kunne have været en afstand til gennemsnittet eller en udvikling over tid.
+- Da vi strøg *navn* og *adresse*, besluttede vi, at barometeret ikke skal kunne genkende nogen.
+:::
+
+# Værktøjerne
+
+To diagrammer: hvem kender hvem, og hvem spørger hvem hvornår.
+
+## Klassediagram
+
+Et **klassediagram** viser, hvilke klasser der findes, og hvordan de kender hinanden. **Ikke** hvad der sker hvornår.
+
+```{mermaid}
+classDiagram
+    class Barometer {
+        +vurder(arbejdsplads)
+    }
+    class Referencetal {
+        +find(arbejdsplads, dimension)
+    }
+    class Resultat {
+        +forklaring()
+        +figur()
+    }
+    Barometer --> Referencetal : har et
+    Barometer ..> Resultat : laver et
+```
+
+::: {.incremental}
+- **Fuld pil:** "har et". `Barometer` holder fast i sit `Referencetal` hele tiden.
+- **Stiplet pil:** "bruger" eller "laver". `Barometer` laver et `Resultat`, men ejer det ikke bagefter.
+:::
+
+## Sekvensdiagram
+
+Et **sekvensdiagram** viser det modsatte: **rækkefølgen**. Hvem spørger hvem, og i hvilken orden? Tryk *Næste trin*.
+
+::: {.figur figur="sekvens" aktoerer="Bruger,app.py,Arbejdsplads,Barometer,Referencetal" beskeder="0>1:taster tal ind;1>2:lav en arbejdsplads;1>3:vurder(arbejdsplads);3>4:find(arbejdsplads, 'kvinder');4>3!:en Referencegruppe;3>1!:et Resultat;1>0:figur og forklaring"}
+:::
+
+::: {.lille}
+Fuld pil er et spørgsmål. Stiplet pil er et svar.
+:::
+
+## Prototyping eller planlægning?
+
+Downey kap. 14 stiller de to op mod hinanden:
+
+:::: {.to-kol}
+::: {.kol}
+**Prototyping**
+
+Skriv noget, der virker på ét tilfælde. Ret det, til det virker på flere.
+
+*Godt,* når man ikke forstår problemet endnu.
+*Risiko:* koden ender som lappeløsninger uden form.
+:::
+
+::: {.kol}
+**Planlagt udvikling**
+
+Forstå problemet først. Find den rigtige opdeling, og byg den.
+
+*Godt,* når man kender området.
+*Risiko:* man planlægger efter et problem, man har misforstået.
+:::
+::::
+
+::: {.fragment}
+I har gjort begge dele. Kravinterviewet var planlægning. De tomme funktioner med `return 0.0` var prototyping. Køreplanen er et forsøg på at lægge det, vi har forstået, fast.
+:::
+
+# Virksomheden som objekt
+
+Hvad en arbejdsplads er, og hvad den kan.
+
+## Hvad en virksomhed *er*, og hvad den *kan*
+
+Objektorienteret programmering er et forsøg på at få koden til at ligne den måde, vi i forvejen taler om verden på. Og vi taler allerede om virksomheder som objekter:
+
+:::: {.to-kol}
+::: {.kol}
+**Den *er* noget** (attributter)
+
+Den har 120 ansatte. Den ligger i Nordjylland. Den er privat. Den er i handelsbranchen.
+:::
+
+::: {.kol}
+**Den *kan* noget** (metoder)
+
+Den ansætter. Den afskediger. Den indberetter. Den beregner sine egne nøgletal.
+:::
+::::
+
+::: {.fragment}
+Når I skriver `skolen.andel("kvinder")`, siger I noget, der kan læses højt som dansk: *skolens andel af kvinder.*
+:::
+
+## Et objekt, der ved noget {.kodelab}
+
+Først en [klasse]{.ord}, der kun **ved** noget.
+
+:::: {.proev gaet="Hvad skriver den sidste linje, print(skolen)?" valg="Skolen|Skolen har 120 ansatte|Noget med \"object at\""}
+```{pyodide}
+class Arbejdsplads:
+    """En arbejdsplads, som barometeret ser den."""
+
+    def __init__(self, navn, ansatte, antal):
+        self.navn = navn          # attributter: det, objektet VED
+        self.ansatte = ansatte
+        self.antal = antal        # en dictionary: kvinder, seniorer, indvandrere
+
+skolen = Arbejdsplads("Skolen", 120, {"kvinder": 84, "seniorer": 26, "indvandrere": 9})
+
+print(type(skolen))
+print(skolen.navn, "har", skolen.ansatte, "ansatte")
+print(skolen)
+```
+
+::: {.forklaring}
+1. {1-2} En klasse med en docstring.
+2. {4-7} `__init__` gemmer tre ting på objektet. `antal` er en dictionary med antallet i hver gruppe.
+3. {9} Lav objektet `skolen`. Dictionaryen skrives direkte i kaldet.
+4. {11} `type(skolen)` viser, at objektet er af den nye type `Arbejdsplads`.
+5. {12} Attributterne kan hentes med punktum.
+6. {13} Python ved ikke, hvordan objektet skal vises, så den skriver typen og et nummer på objektets plads i hukommelsen.
+:::
+::::
+
+::: {.fragment}
+Den sidste linje er grim. Python ved ikke, hvordan en arbejdsplads skal se ud, når man printer den.
+:::
+
+## Metoder og `__str__` {.kodelab}
+
+Nu kan klassen også noget: regne en andel ud og vise sig selv pænt.
+
+:::: {.proev forslag="Ret `__str__`, så den også viser andelen af seniorer."}
+```{pyodide}
+class Arbejdsplads:
+    """En arbejdsplads, som barometeret ser den."""
+
+    def __init__(self, navn, ansatte, antal):
+        self.navn = navn
+        self.ansatte = ansatte
+        self.antal = antal
+
+    def andel(self, gruppe):
+        """Andelen i én gruppe, som et tal mellem 0 og 1."""
+        return self.antal[gruppe] / self.ansatte
+
+    def __str__(self):
+        return f"{self.navn}: {self.ansatte} ansatte, {self.andel('kvinder'):.0%} kvinder"
+
+skolen = Arbejdsplads("Skolen", 120, {"kvinder": 84, "seniorer": 26, "indvandrere": 9})
+
+print(skolen)
+print(skolen.andel("seniorer"))
+```
+
+::: {.forklaring}
+1. {4-7} Samme `__init__` som før.
+2. {9-11} En metode, der regner andelen i én gruppe ud. `self.antal[gruppe]` slår gruppen op i dictionaryen.
+3. {13-14} `__str__` bestemmer, hvordan objektet ser ud, når det bliver printet. Den skal returnere en tekst.
+4. {16} Lav objektet igen med den nye klasse.
+5. {18} Nu bruger `print` vores `__str__`.
+6. {19} Seniorernes andel: 26 ud af 120.
+:::
+::::
+
+::: {.lille}
+`__str__` er en **speciel metode**. Den kaldes af `print` og af `str()`, uden at nogen beder om det. Se Downey kap. 15.
+:::
+
+# Dataene
+
+Referencetallene ligger i syv tabeller, der peger på hinanden.
+
+## Referencetallene er en lille database
+
+De ligger i `data/` som **syv tabeller**. Det er typisk sådan, rigtige data er organiseret.
+
+| Tabel | Hvad den indeholder |
+|---|---|
+| `brancher`, `regioner`, `sektorer`, `stoerrelser` | Opslagstabeller: et id og et navn |
+| `dimensioner` | De tre ting, vi måler |
+| `grupper` | Én række pr. sammenligningsgruppe, med et id til hver af de fire opslagstabeller, et år og antal arbejdssteder |
+| `fordelinger` | Én række pr. gruppe **og** dimension: `p10` til `p90` |
+
+## Sådan hænger tabellerne sammen
+
+```{mermaid}
+erDiagram
+    grupper ||--o{ fordelinger : har
+    brancher ||--o{ grupper : "branche_id"
+    regioner ||--o{ grupper : "region_id"
+    sektorer ||--o{ grupper : "sektor_id"
+    stoerrelser ||--o{ grupper : "stoerrelse_id"
+    dimensioner ||--o{ fordelinger : "dimension_id"
+```
+
+::: {.fragment}
+Stregerne betyder **én til mange**: én branche optræder i mange grupper. Én gruppe har tre fordelinger, én pr. dimension.
+:::
+
+## At sætte to tabeller sammen {.kodelab}
+
+Tre små tabeller kobles sammen på deres fælles kolonner.
+
+:::: {.proev forslag="Fjern `.merge(brancher, on=\"branche_id\")` i linje 15. Hvilken kolonne mangler så?"}
+```{pyodide}
+import pandas as pd
+
+# I virkeligheden læses de med pd.read_csv("data/brancher.csv") og så videre.
+brancher = pd.DataFrame({"branche_id": [0, 3], "branche": ["Alle", "Handel"]})
+
+grupper = pd.DataFrame({"gruppe_id": [11, 12], "branche_id": [3, 3],
+                        "stoerrelse": ["50-99", "100-249"],
+                        "antal_arbejdssteder": [38, 52]})
+
+fordelinger = pd.DataFrame({"gruppe_id": [11, 12],
+                            "dimension": ["kvinder", "kvinder"],
+                            "p50": [0.448, 0.439]})
+
+tal = (fordelinger
+       .merge(grupper, on="gruppe_id")
+       .merge(brancher, on="branche_id"))
+
+print(tal[["branche", "stoerrelse", "dimension", "p50", "antal_arbejdssteder"]])
+```
+
+::: {.forklaring}
+1. {1} Hent pandas, der kan arbejde med tabeller.
+2. {3-4} Tre små tabeller, skrevet direkte i koden. Kommentaren siger, hvordan de rigtige læses fra filerne.
+3. {6-8} `grupper` peger på en branche med `branche_id`.
+4. {10-12} `fordelinger` peger på en gruppe med `gruppe_id`.
+5. {14-16} Kæden: start med fordelingerne, kobl grupperne på via `gruppe_id`, og kobl derefter brancherne på via `branche_id`. Parentesen gør, at kæden må stå på flere linjer.
+6. {18} Vis kun de fem kolonner, vi har brug for.
+:::
+::::
+
+::: {.lille}
+`merge` sætter to tabeller sammen på en fælles kolonne. I en database hedder det et **join**. Det er den samme operation, og vi ser den igen i lektion 8.
+:::
+
+## To ting, I skal regne med
+
+- **Nogle grupper mangler.** 28 ud af 128 kombinationer er udeladt, fordi der ville være for få arbejdssteder i dem. Fx *Industri, 50-99 ansatte, privat sektor* i 2022.
+- **Der er ingen løn og ingen kommuner.** Uanset hvor gerne vi vil. Det er ikke en mangel i filen. Det er en grænse for, hvad barometeret kan svare på.
+
+# Workshop
+
+Videre arbejde med mini-projektet.
+
+## Sync jeres gruppes fork
+
+Hent `KOEREPLAN.md` ind i jeres gruppes fork: **Sync fork** på jeres forks side på GitHub, og derefter **Pull** i VS Code.
+
+[GitHubs guide til at synkronisere en fork](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/syncing-a-fork)
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+Design er oversættelse fra naturligt til formelt sprog. Hver oversættelse er et valg, og noget går tabt.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Arbejd videre i gruppens fork efter køreplanen. Commit og push, inden I går.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion 6: Python-workshop](../06-python-workshop/index.html). Læs Downey kap. 8 til 13.
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

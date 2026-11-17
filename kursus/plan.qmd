@@ -1,0 +1,31 @@
+---
+title: "Lektionsplan"
+subtitle: "{{< var semester >}} · hver kursusgang er forelæsning og workshop"
+listing:
+  id: plan
+  contents: "../lektioner/*/index.qmd"
+  template: ../_extensions/sds1/lektionsplan.ejs
+  sort: "lektion"
+  date-format: "dddd D. MMMM"
+  fields: [lektion, title, date, description, workshop, status, slides, litteratur]
+---
+
+Hver lektion har sin egen side med beskrivelse, forberedelse, slides og øvelser. Litteraturen herunder er den korte udgave. Tid og sted står i CalMoodle.
+
+::: {#plan}
+:::
+
+## Vigtige datoer
+
+| Dato | Hvad |
+|---|---|
+| Tirsdag 15. september 2026 | Første kursusgang |
+| Tirsdag 27. oktober 2026 | Sidste kursusgang: eksamensforberedelse |
+| {{< var eksamen >}} | [Eksamen](eksamen.qmd) |
+
+## Grundbøger
+
+- Kernighan, B. W. (2021): *Understanding the Digital World: What You Need to Know about Computers, the Internet, Privacy, and Security*, 2. udgave. Princeton University Press. Kan købes hos Faktum.
+- Downey, A. B. (2024): [*Think Python: How to Think Like a Computer Scientist*, 3. udgave]({{< var think-python >}}). O'Reilly Media. Frit tilgængelig online.
+
+Det forventes, at I læser **inden** forelæsningen.

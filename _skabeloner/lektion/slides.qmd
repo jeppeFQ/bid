@@ -1,0 +1,142 @@
+---
+title: "TITEL PÅ LEKTIONEN"
+subtitle: "Lektion 99"          # vises som mærkat på titelslidet
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: lyseblaa               # lektionens farve: lyseblaa | turkis | orange | lilla | gul
+---
+
+<!-- SKABELON. Slet det, I ikke skal bruge. Alle byggeklodser er vist én gang.
+     Regler: ét budskab pr. slide · vis begrebet før syntaksen · hver kodecelle har en forklaring
+     · brug ikke ### inde i bokse. -->
+
+## I dag
+
+1. **Første del.** Én linje.
+2. **Anden del.** Én linje.
+3. **Workshop.**
+
+# Navn på første del
+
+Én linje om, hvad der kommer. (Et `#` giver et sektionsslide med nummer.)
+
+## {.udsagn}
+
+Én sætning eller ét tal, **meget stort**.
+
+## Indhold: tekst ved siden af en figur
+
+:::: {.to-kol}
+::: {.kol}
+Tekst til venstre. Ord fra ordlisten får en forklaring ved hover: [algoritme]{.ord}.
+
+Tryk *Næste trin* i figuren.
+:::
+
+::: {.figur figur="lag" retur="ja" lag="Siden|det, brugeren ser;Appen|læser felterne;Kernen|klasserne;Data|referencetallene"}
+:::
+::::
+
+## Kodelab: Demo (kører af sig selv) {.kodelab}
+
+:::: {.demo}
+```{pyodide}
+ansatte = 120
+kvinder = 84
+print(kvinder / ansatte)
+```
+
+::: {.forklaring}
+1. {1-2} To variable: et navn og en værdi.
+2. {3} Del, og vis resultatet.
+:::
+::::
+
+## Kodelab: Prøv selv {.kodelab}
+
+:::: {.proev forslag="Skift `84` ud med `30`."}
+```{pyodide}
+def andel(antal, i_alt):
+    return antal / i_alt
+
+print(andel(84, 120))
+```
+
+::: {.forklaring}
+1. {1-2} En funktion med to parametre, der giver andelen tilbage.
+2. {4} Kald funktionen, og vis svaret.
+:::
+::::
+
+## Kodelab: gæt først {.kodelab}
+
+:::: {.proev gaet="Hvad skriver Python ud?" valg="5|23|En fejl"}
+```{pyodide}
+print("2" + "3")
+```
+
+::: {.forklaring}
+1. {1} Anførselstegn betyder tekst. `+` sætter to tekster sammen.
+:::
+::::
+
+## Opgave: Øvelse med automatisk tjek {.opgave}
+
+::: {.opgavetekst}
+Regn andelen ud for en arbejdsplads med **60** ansatte, hvoraf **15** er kvinder.
+
+[2 min]{.timer tid=120}
+:::
+
+:::: {.oevelse}
+```{pyodide}
+andel(______, ______)
+```
+
+::: {.hint}
+Først antallet i gruppen, så det samlede antal.
+:::
+
+::: {.loesning}
+```python
+andel(15, 60)
+```
+:::
+
+```{pyodide}
+#| check: true
+try:
+    ok = abs(float(result) - 0.25) < 1e-9
+except Exception:
+    ok = False
+feedback = {"correct": ok, "message": "Rigtigt! 15 af 60 er 0,25." if ok else "Ikke helt. Prøv igen."}
+feedback
+```
+::::
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+Én eller to sætninger.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Øvelsesarket ligger på Moodle.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion XX: Titel](../XX-mappe/index.html)
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

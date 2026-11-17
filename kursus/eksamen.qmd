@@ -1,0 +1,24 @@
+---
+title: "Eksamen"
+subtitle: "Udvikling af IT-systemer · {{< var semester >}}"
+---
+
+## Prøven
+
+| | |
+|---|---|
+| Prøvens navn | Udvikling af IT-systemer |
+| Prøveform | Skriftlig eller mundtlig |
+| Omfang | {{< var ects >}} |
+| Hjælpemidler | Med visse hjælpemidler |
+| Bedømmelse | 7-trins-skala |
+| Censur | Intern prøve |
+| Tidspunkt | {{< var eksamen >}} |
+
+Vurderingskriterierne er angivet i universitetets eksamensordning. Eksamensspørgsmål, eksamensregler og reglerne om eksamenssnyd og plagiat ligger på [Moodle]({{< var moodle >}}).
+
+## Forberedelse
+
+Sidste kursusgang ([lektion 10](../lektioner/10-chatbots-nlp-og-chatgpt/index.qmd)) slutter med eksamensforberedelse og spørgsmål. Brug [lektionsplanen](plan.qmd) til at gå litteraturen igennem, og [mini-projektet](miniprojekt.qmd) til at genopfriske, hvad I har bygget.
+
+Spørgsmål om prøven går til Studienævnet for Politik og Samfund.

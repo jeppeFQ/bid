@@ -1,0 +1,38 @@
+---
+title: "Softwaredesign"
+lektion: 5
+date: 2026-10-02
+description: "Design som oversættelse fra naturligt til formelt sprog. Objektorienteret analyse og design, klasse- og sekvensdiagrammer."
+workshop: "Videre arbejde med mini-projektet"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Downey (2024), kap. 14, 15 og 16"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 12.30–16.15 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Denne gang træder vi et skridt tilbage og anskuer softwaredesign som et oversættelsesproblem: at oversætte et problem fra naturligt (menneskers) til formelt (computerens) sprog. Det kompliceres af, at naturligt sprog typisk ikke er lige så præcist som formelle sprog. Objektorienteret programmering er i sig selv et forsøg på at få computerens formelle sprog til at minde mere om den måde, vi mennesker beskriver opgaver og problemer. Vi ser på et udpluk af metoder og diagrammer til objektorienteret analyse og design.
+
+## Workshop
+
+Videre arbejde med mini-projektet: klasserne, dataene og designdokumentet.
+
+## Forberedelse og litteratur
+
+- Downey (2024): *Think Python*, kapitel 14, 15 og 16.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

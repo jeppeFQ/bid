@@ -1,0 +1,513 @@
+---
+title: "Git og versionskontrol"
+subtitle: "Lektion 03"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: orange
+---
+
+## I dag
+
+1. **Filsystemet.** Kort genopfriskning: det er filerne, Git holder øje med.
+2. **Versionskontrol.** Hvad er det, og hvorfor?
+3. **Git i praksis.** De fem kommandoer, I skal bruge, og de samme knapper i VS Code.
+4. **Fork og pull request.** At arbejde i andres kode.
+5. **Workshop.** I tilføjer jer til mini-projektet, laver jeres eget repository og fortsætter med Python-øvelserne dér.
+
+# Filsystemet
+
+Git holder øje med filer og mapper. Derfor starter vi dér.
+
+## Hvad er en fil?
+
+En **fil** er en sekvens af data, gemt som én samlet enhed: tekst, billeder, programmer, notebooks. Under overfladen er det hele **bytes**, som vi så i lektion 1.
+
+:::: {.to-kol}
+::: {.kol}
+**Navn og endelse**
+
+`projekt.docx`
+
+- basenavn: `projekt`
+- endelse: `.docx` fortæller, hvilken slags data filen indeholder, og hvilket program der skal læse den.
+:::
+
+::: {.kol}
+**Metadata**
+
+Data *om* filen: størrelse i bytes, oprettelses- og ændringsdato, ejer og adgangsrettigheder.
+:::
+::::
+
+## Mapper er et træ
+
+:::: {.to-kol .smal-bred}
+::: {.kol}
+En **mappe** er en beholder til filer og andre mapper.
+
+Øverst står **roden**: `/` på macOS og Linux, et drevbogstav som `C:\` på Windows.
+
+Klik på en fil eller mappe i træet, og se dens **sti**: adressen fra roden og ned.
+:::
+
+::: {.figur figur="filtrae" staar="Users/jeppe/Documents/1-bid"}
+:::
+::::
+
+## Absolutte og relative stier
+
+:::: {.to-kol}
+::: {.kol}
+**Absolut sti:** fra roden og hele vejen ned.
+
+```
+/Users/jeppe/Documents/1-bid/data/salg.csv
+C:\Users\jeppe\Documents\1-bid\data\salg.csv
+```
+:::
+
+::: {.kol}
+**Relativ sti:** fra dér, hvor man står. Står notebooken i `1-bid`, er det nok at skrive:
+
+```
+data/salg.csv
+```
+:::
+::::
+
+::: {.fragment}
+**Relative stier gør et projekt flytbart.** En notebook, der læser `data/salg.csv`, virker også på en andens computer, hvis de har hentet hele mappen `1-bid`. En notebook, der læser `/Users/jeppe/…`, virker kun hos mig. Det bliver afgørende, når I deler kode via Git.
+:::
+
+## Hvor lægger I jeres filer?
+
+- Hvordan ser jeres mappestruktur ud til studiet? Kan I finde en fil fra første semester på under ti sekunder?
+- Hvorfor er skrivebordet et dårligt sted til et kodeprojekt?
+
+[3 min]{.timer tid=180}
+
+::: {.fragment .lille}
+Et hint til det sidste: på mange computere bliver skrivebordet synkroniseret til iCloud eller OneDrive. Når en synkroniseringstjeneste og Git begge prøver at holde styr på de samme filer, opstår der problemer, der er svære at gennemskue og kan koste mange timer.
+:::
+
+# Versionskontrol
+
+En fortryd-knap for hele projektet, med en logbog over, hvem der trykkede.
+
+## Kender I den her?
+
+:::: {.to-kol}
+::: {.kol}
+```
+/projektarbejde
+└── backup
+    ├── projekt_281024.docx
+    ├── projekt_311024.docx
+    ├── projekt_041224.docx
+    ├── projekt_final.docx
+    ├── projekt_final2.docx
+    ├── projekt_final3.docx
+    ├── projekt_final_final.docx
+    └── projekt_FINAL.docx
+```
+:::
+
+::: {.kol}
+::: {.incremental}
+- Hvilken er den nyeste?
+- Hvad er forskellen på `final2` og `final3`?
+- Hvem skrev afsnit 4 om, og hvorfor?
+:::
+:::
+::::
+
+## Versionskontrol: én fil, hele historikken
+
+**Versionskontrol** er et system, der holder styr på ændringer i filer over tid, så man kan komme tilbage til en tidligere udgave.
+
+:::: {.to-kol}
+::: {.kol}
+**Før**
+
+```
+/projektarbejde
+└── backup
+    ├── projekt_final.docx
+    ├── projekt_final2.docx
+    ├── projekt_final_final.docx
+    └── projekt_FINAL.docx
+```
+:::
+
+::: {.kol}
+**Med Git**
+
+```
+/projektarbejde
+├── .git          ← hele historikken
+└── projekt.docx  ← kun én fil
+```
+:::
+::::
+
+Med Git kan man rulle enkelte filer eller hele projektet tilbage, sammenligne udgaver og se, hvem der ændrede hvad og hvornår (Chacon & Straub, *Pro Git*, kap. 1).
+
+## Tre måder at gemme historikken på
+
+Hvor ligger historikken? Tryk *Næste trin*.
+
+::: {.figur figur="vcs"}
+:::
+
+**Git er distribueret:** alle har en fuld kopi af hele historikken. Går serveren ned, mister ingen noget.
+
+## Git er ikke GitHub
+
+:::: {.to-kol}
+::: {.kol}
+**Git**
+
+Et **program** på jeres computer, der holder styr på historikken i en mappe.
+
+Virker uden internet. Virker uden konto. Er gratis og open source.
+:::
+
+::: {.kol}
+**GitHub**
+
+En **hjemmeside**, der opbevarer Git-repositories og gør det let at dele dem.
+
+Ejes af Microsoft. Der findes alternativer: GitLab, Bitbucket, Codeberg.
+:::
+::::
+
+# Git i praksis
+
+Fem kommandoer dækker det meste, og VS Code har en knap til hver.
+
+## Første gang: fortæl Git, hvem I er
+
+Hvert [commit]{.ord} bliver stemplet med et navn og en e-mail. Det skal sættes **én gang pr. computer**:
+
+```bash
+git config --global user.name "Dit Navn"
+git config --global user.email "din@mail.dk"
+git config --global --list
+```
+
+::: {.forklaring}
+1. {1} `git config` ændrer Gits indstillinger. `--global` betyder: for alle repositories på denne computer. Navnet står i anførselstegn, fordi det indeholder et mellemrum.
+2. {2} Det samme for e-mailen. Brug **samme e-mail som på jeres GitHub-konto**, ellers kan GitHub ikke koble jeres commits til jer.
+3. {3} `--list` viser alle indstillinger, så I kan tjekke, at de to linjer er kommet med.
+:::
+
+::: {.lille}
+Glemmer I det, afviser Git jeres første commit med beskeden *Please tell me who you are*.
+:::
+
+## Git gemmer øjebliksbilleder med fingeraftryk {.kodelab}
+
+Git gemmer ikke "ændringer". Hvert commit er et **øjebliksbillede** af filerne, og indholdet får et **fingeraftryk** på 40 tegn.
+
+:::: {.proev forslag="Ret ét bogstav i linje 10. Hvor meget af fingeraftrykket ændrer sig?" gaet="Linje 9 og 11 regner på præcis samme tekst. Får de samme fingeraftryk?" valg="Ja|Nej|Det er tilfældigt"}
+```{pyodide}
+import hashlib
+
+def git_fingeraftryk(tekst):
+    data = tekst.encode("utf-8")
+    hoved = f"blob {len(data)}\0".encode("utf-8")
+    return hashlib.sha1(hoved + data).hexdigest()
+
+print(git_fingeraftryk('print("Første commit")\n'))
+print(git_fingeraftryk('print("Første commit!")\n'))
+print(git_fingeraftryk('print("Første commit")\n'))
+```
+
+::: {.forklaring}
+1. {1} `hashlib` er et bibliotek, der kan lave fingeraftryk. Det følger med Python.
+2. {3} `def git_fingeraftryk(tekst):` definerer en funktion, der tager en tekst ind.
+3. {4} `.encode("utf-8")` laver teksten om til bytes: tal, som computeren kan regne på.
+4. {5} Git sætter et lille "hoved" foran indholdet: ordet `blob`, længden i bytes og et nul-tegn (`\0`). Det er Gits egen opskrift.
+5. {6} `hashlib.sha1(...)` regner fingeraftrykket ud. `.hexdigest()` skriver det som 40 tegn fra 0-9 og a-f.
+6. {8-10} Tre linjer kode. Den midterste har ét udråbstegn mere end de to andre.
+:::
+::::
+
+::: {.lille}
+Det første fingeraftryk er præcis det, `git hash-object` giver for en fil med den linje. Python og Git regner det samme ud, fordi det bare er matematik på bytes: alt er tal.
+:::
+
+## Et repository: en mappe med en hukommelse
+
+Et **[repository]{.ord}** er en mappe, Git holder øje med. Der er to måder at få et på:
+
+:::: {.to-kol}
+::: {.kol}
+**Start et nyt**
+
+```bash
+cd 1-bid
+git init
+```
+
+`cd` går ind i mappen. `git init` laver den skjulte `.git`-mappe. Det er dér, hele historikken bor.
+:::
+
+::: {.kol}
+**Hent et, der findes**
+
+```bash
+git clone https://github.com/…
+```
+
+Henter mappen **og** hele dens historik ned på jeres computer.
+:::
+::::
+
+::: {.lille}
+Kør `git init` i den rigtige mappe. Kører I den i jeres hjemmemappe, begynder Git at holde øje med *alt* på computeren.
+:::
+
+## De tre stadier: mappe, pakkeliste, historik
+
+En ændring flytter sig gennem tre steder. Tryk *Næste trin*, og følg filen.
+
+::: {.figur figur="git" fil="analyse.ipynb" remote="nej"}
+:::
+
+:::: {.to-kol .lille}
+::: {.kol}
+**Working directory:** den mappe, I arbejder i. **Staging area:** pakkelisten til næste commit (filen `.git/index`).
+:::
+
+::: {.kol}
+**Repository:** det, der står på pakkelisten, bliver en permanent del af historikken, når I committer.
+:::
+::::
+
+## De kommandoer, I skal bruge
+
+| Hvad | Terminalen | VS Code: Source Control |
+|---|---|---|
+| Hvad er ændret? | `git status` | listen over ændrede filer |
+| Læg på pakkelisten | `git add fil.ipynb` | **+** ud for filen |
+| Gem i historikken | `git commit -m "besked"` | skriv beskeden, klik **Commit** |
+| Send op til GitHub | `git push` | **Sync Changes** |
+| Hent andres ændringer | `git pull` | **···** → **Pull** |
+| Se historikken | `git log --oneline` | **Graph** nederst i panelet |
+
+::: {.lille}
+I behøver ikke terminalen i dag: VS Code kan det hele. Men knapperne kører præcis de samme kommandoer, og når noget går galt, er det kommandoernes fejlbeskeder, I skal kunne læse.
+:::
+
+## Gode commit-beskeder
+
+En commit-besked er en besked **til jer selv om tre måneder**.
+
+:::: {.to-kol}
+::: {.kol}
+**Dårlige**
+
+```
+opdatering
+rettelser
+asdf
+virker nu
+final
+```
+:::
+
+::: {.kol}
+**Gode**
+
+```
+Tilføj indkomstgrænse til vurder()
+Ret stavefejl i begrundelse
+Tilføj test af familie D
+Læs salg.csv med relativ sti
+```
+:::
+::::
+
+Skriv, hvad commit'et **gør**, i bydeform. **Én ting pr. commit.**
+
+## Notebooks og Git
+
+En notebook gemmer også sit **output**: tal, tabeller, figurer. Kører I en celle igen, ændres outputtet, og Git tror, filen er ændret.
+
+:::: {.to-kol}
+::: {.kol}
+**1 · Ryd output, før I committer**
+
+**···** øverst i notebooken → **Clear All Outputs**.
+
+**2 · Fortæl Git, hvad den skal ignorere**
+
+En fil ved navn `.gitignore` i roden af repositoriet. Én linje pr. fil eller mappe.
+:::
+
+::: {.kol}
+```
+.ipynb_checkpoints/
+__pycache__/
+.DS_Store
+data/stor-fil.csv
+```
+
+::: {.forklaring}
+1. {1} Mapper, som VS Code og Jupyter laver af sig selv. En skråstreg til sidst betyder *hele mappen*.
+2. {2} Pythons midlertidige filer.
+3. {3} En skjult fil, som macOS lægger i alle mapper.
+4. {4} En bestemt datafil, der er for stor til Git.
+:::
+:::
+::::
+
+::: {.lille}
+Store datafiler hører sjældent hjemme i Git. Og data om personer gør det **aldrig**, heller ikke i et privat repository.
+:::
+
+## Arbejdsgangen
+
+Hver gang I sætter jer til at arbejde:
+
+::::: {.trin-kort}
+:::: {.kol}
+1 · Hent
+
+`git pull`
+
+De seneste ændringer fra GitHub.
+::::
+
+:::: {.fragment}
+2 · Arbejd
+
+Skriv kode. Gem filen.
+::::
+
+:::: {.fragment}
+3 · Pak
+
+`git add`
+
+Læg ændringerne på pakkelisten.
+::::
+
+:::: {.fragment}
+4 · Gem
+
+`git commit`
+
+Øjebliksbillede i historikken, lokalt.
+::::
+
+:::: {.fragment}
+5 · Del
+
+`git push`
+
+Send det op til GitHub.
+::::
+:::::
+
+# Fork og pull request
+
+Sådan arbejder man i kode, man ikke selv ejer.
+
+## At arbejde i andres kode: fork og pull request
+
+Man kan ikke pushe direkte til andres repository. I stedet laver man en **[fork]{.ord}**, sin egen kopi på GitHub, og beder bagefter ejeren om at trække ændringerne ind. Det kaldes en **[pull request]{.ord}**.
+
+::: {.figur figur="fork" original="jeppeFQ" repo="BID-workshop-projekt"}
+:::
+
+::: {.lille}
+Sådan bliver stort set al open source-software til: tusindvis af mennesker, der aldrig har mødt hinanden, sender pull requests til hinandens projekter.
+:::
+
+## Fork eller clone?
+
+| | **Fork** | **Clone** |
+|---|---|---|
+| Hvor sker det? | På GitHub | På jeres computer |
+| Hvad får I? | En kopi under jeres egen konto | En lokal kopi af et repository |
+| Hvornår? | Når I vil ændre i andres projekt | Når I vil arbejde på filerne |
+
+I workshoppen gør I begge dele: først **fork** på GitHub, så **clone af jeres egen fork** ned i VS Code.
+
+::: {.lille}
+Den hyppigste fejl i dag: at clone min udgave i stedet for jeres fork. Så får I *Permission denied*, når I pusher, for I har ikke lov til at skrive i mit repository.
+:::
+
+## Det, der er offentligt, er offentligt
+
+Workshop-projektet er et **offentligt** repository. Alt, hvad I skriver i det, kan læses af alle på internettet, og det bliver liggende i historikken, også hvis det slettes bagefter.
+
+::: {.incremental}
+- Skriv jeres GitHub-brugernavn, ikke jeres fulde navn, hvis I hellere vil det.
+- Ingen CPR-numre, adresser eller telefonnumre, **nogensinde**, i noget repository.
+- Et commit er ikke let at fortryde, når det først er pushet.
+:::
+
+::: {.fragment}
+Data, der først er delt, er svære at få tilbage. Det vender vi tilbage til i lektion 7.
+:::
+
+# Workshop
+
+Først sammen i mini-projektet, så jeres eget repository.
+
+## Øvelse 1: jeres første pull request
+
+Følg arket. Kort fortalt:
+
+1. **Fork** `github.com/jeppeFQ/BID-workshop-projekt`.
+2. **Clone** jeres fork i VS Code.
+3. Kopiér `deltagere/_skabelon.md` til `deltagere/<jeres-brugernavn>.md`, og udfyld den.
+4. **Commit** med en god besked, og **push**.
+5. Åbn en **pull request** til mit repository.
+
+[25 min]{.timer tid=1500}
+
+## Øvelse 2: jeres eget repository
+
+Det repository, I laver nu, er det, I skal arbejde i resten af kurset.
+
+1. Lav en ny mappe, `1-bid-<brugernavn>`, og læg jeres notebooks fra sidste workshop i den.
+2. Åbn mappen i VS Code.
+3. Source Control → **Initialize Repository**.
+4. Tilføj en `.gitignore` med linjerne fra før.
+5. Første commit: `Tilføj notebooks fra Python-workshoppen`.
+6. **Publish Branch** → vælg **private** → VS Code opretter det på GitHub for jer.
+
+::: {.lille}
+Vælg *private*. Det er jeres arbejde, og I bestemmer selv, hvem der skal se det. I kan give mig adgang under *Settings → Collaborators*, hvis I vil have feedback.
+:::
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+Git gemmer øjebliksbilleder af en mappe. Pull, add, commit, push: hver gang.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Øvelsesarket ligger på Moodle. Læs *Pro Git* kap. 1 og 2, hvis I ikke har gjort det.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion 4: Programmeringsparadigmer og algoritmer](../04-paradigmer-og-algoritmer/index.html).
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

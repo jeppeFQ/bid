@@ -1,0 +1,38 @@
+---
+title: "Chatbots, NLP og ChatGPT"
+lektion: 10
+date: 2026-10-27
+description: "Hvordan ord bliver til tal, hvordan en sprogmodel gætter næste ord, og hvad transformeren gør. Til sidst bias og eksamen."
+workshop: "Eksamensforberedelse og -spørgsmål"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "*Tænker sprogmodeller?* (skim)"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 08.15–12.00 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Lektionen handler om sprogmodeller: AI-systemer, der er trænet til at forstå og generere menneskeligt sprog. Sprogmodeller lærer sproglige mønstre ved at analysere store mængder tekst og tilegner sig derved viden om, hvordan ord og sætninger hænger sammen. Moderne sprogmodeller bygger på deep learning og en arkitektur, der hedder *transformeren*. Vi arbejder hen imod en konceptuel forståelse af den arkitektur og de mekanismer, der gør det muligt for sprogmodeller at behandle og generere sprog.
+
+## Workshop
+
+Spørg en chatbot, og eksamensforberedelse.
+
+## Forberedelse og litteratur
+
+- *Tænker sprogmodeller?* Skim teksten [*On the Biology of a Large Language Model*](https://transformer-circuits.pub/2025/attribution-graphs/biology.html), og se kompleksiteten i sprogmodellers arkitektur, og hvor svært det er at forstå, hvordan de faktisk virker.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

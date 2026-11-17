@@ -1,0 +1,41 @@
+---
+title: "Plain text, compilere og markup"
+lektion: 9
+date: 2026-10-23
+description: "Hvad plain text er, hvordan en compiler oversætter, og hvordan markup bliver til en hjemmeside. Målet: barometerets hjemmeside."
+workshop: "Markdown-øvelser i Positron/VS Code"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Kernighan (2021), kap. 5 og 10"
+  - "Healy, *The Plain Person's Guide to Plain Text Social Science*"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 08.15–12.00 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Kode, data og dokumenter er tekst. Vi ser på, hvorfor plain text er så stærkt, hvordan en compiler oversætter fra det, mennesker skriver, til det, maskiner gør, og hvordan markup (HTML, Markdown, YAML og CSS) bliver til en hjemmeside. Målet er at bygge barometerets egen hjemmeside.
+
+## Workshop
+
+Markdown-øvelser i Positron eller VS Code, og barometerets hjemmeside med Quarto.
+
+## Forberedelse og litteratur
+
+- Kernighan (2021): *Understanding the Digital World*, kapitel 5 og 10.
+- Healy: [*The Plain Person's Guide to Plain Text Social Science*](https://plain-text.co), introduktionen og afsnittet *Write and Edit*.
+- [Quartos *Markdown Basics*](https://quarto.org/docs/authoring/markdown-basics.html) som opslagsværk i workshoppen.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

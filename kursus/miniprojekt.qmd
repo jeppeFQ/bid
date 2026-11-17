@@ -1,0 +1,114 @@
+---
+title: "Mini-projektet"
+subtitle: "Diversitetsbarometeret · fra lektion 3 til lektion 10"
+---
+
+Fra lektion 3 arbejder grupperne i det samme projekt: et online barometer, hvor en arbejdsplads kan se, hvordan den ligger i forhold til sammenlignelige arbejdspladser. Denne side samler det, der står spredt i slides, så I kan finde det igen. Der er intet nyt her.
+
+Projektets repository: [`jeppeFQ/BID-workshop-projekt`]({{< var projekt >}}).
+
+## Bestillingen
+
+> "Jeg har skrevet en rapport om diversitet på danske arbejdspladser. Nu vil jeg gerne have sådan et **online barometer**, hvor en virksomhed kan taste sine egne tal ind og se, hvordan de ligger i forhold til andre. Det skal også kunne bruges til at slå ting op. Kan I ikke bygge det?"
+
+Sådan lød bestillingen i [lektion 4](../lektioner/04-paradigmer-og-algoritmer/index.qmd). Man kan ikke bygge efter den. Efter interviewet med kunden blev den til én sætning, som kunden kunne sige ja til ([lektion 5](../lektioner/05-softwaredesign/index.qmd)):
+
+> "Vi bygger en hjemmeside, som gør det muligt for en HR-medarbejder på en arbejdsplads med mindst 50 ansatte at se, hvor arbejdspladsen ligger på tre andele i forhold til sammenlignelige arbejdspladser. Vi bygger ikke en rangliste, og vi viser ikke enkelte arbejdspladser."
+
+::: {.callout-note}
+## Aldrig ét samlet tal
+Barometeret viser altid tre placeringer, én pr. dimension (kvinder, seniorer og indvandrerbaggrund). Det står i køreplanen, fordi det er den eneste beslutning, rapporten træffer for os.
+:::
+
+## Produktet: fire sider
+
+| Side | Hvad den gør |
+|---|---|
+| **Forside** | Hvad barometeret er, hvem det er til, og hvad det ikke kan |
+| **Barometer** | Brugeren taster sine tal ind og ser, hvor arbejdspladsen ligger |
+| **Opslag** | Fordelingerne for brancher, størrelser og regioner, uden at taste noget ind |
+| **Om** | Data, definitioner, begrænsninger, og hvad barometeret ikke må bruges til |
+
+Alt sammen bygget med Quarto og lagt på GitHub Pages fra jeres egen fork.
+
+:::: {.columns}
+::: {.column width="50%"}
+**Brugeren taster ind**
+
+- Branche, sektor, region
+- Antal ansatte
+- Heraf kvinder
+- Heraf 55 år eller derover
+- Heraf med indvandrerbaggrund
+:::
+
+::: {.column width="50%"}
+**Brugeren får**
+
+- Tre placeringer, én pr. dimension
+- En figur med tre paneler
+- En kort forklaring i ord
+- Besked, hvis gruppen måtte gøres bredere
+- Besked, hvis der er under 50 ansatte
+:::
+::::
+
+## Arkitekturen: fire lag
+
+Hvert lag taler kun med laget lige under.
+
+1. **Siden:** Quarto og appen. Det, brugeren ser.
+2. **Appen:** `app.py` læser felterne og viser svaret.
+3. **Kernen:** mappen `barometer/` med alle klasserne.
+4. **Data:** aggregerede tal fra Danmarks Statistik.
+
+## Klasserne
+
+| Klasse | Ved | Kan |
+|---|---|---|
+| `Arbejdsplads` | ansatte, antal i hver gruppe, branche, sektor, region | `andel(dimension)`, `stoerrelsesgruppe` |
+| `Referencetal` | alle referencetallene | `find(arbejdsplads, dimension)`, `muligheder(kolonne)` |
+| `Referencegruppe` | beskrivelse, antal arbejdssteder, percentiler | `median()` |
+| `Placering` | dimension, andel, referencegruppe | `interval()`, `saetning()` |
+| `Barometer` | referencetallene | `vurder(arbejdsplads)` |
+| `Resultat` | arbejdspladsen og de tre placeringer | `forklaring()`, `figur()` |
+
+## Dataene
+
+Referencetallene ligger i `data/` som **syv tabeller**, der peger på hinanden med id'er ([lektion 5](../lektioner/05-softwaredesign/index.qmd) og [lektion 8](../lektioner/08-sql-og-databaser/index.qmd)).
+
+| Tabel | Hvad den indeholder |
+|---|---|
+| `brancher`, `regioner`, `sektorer`, `stoerrelser` | Opslagstabeller: et id og et navn |
+| `dimensioner` | De tre ting, vi måler |
+| `grupper` | Én række pr. sammenligningsgruppe, med et id til hver af de fire opslagstabeller, et år og antal arbejdssteder |
+| `fordelinger` | Én række pr. gruppe **og** dimension: `p10` til `p90` |
+
+To ting, I skal regne med:
+
+- **Nogle grupper mangler.** 28 ud af 128 kombinationer er udeladt, fordi der ville være for få arbejdssteder i dem.
+- **Der er ingen løn og ingen kommuner.** Det er ikke en mangel i filen. Det er en grænse for, hvad barometeret kan svare på.
+
+## Sådan arbejder I i Git
+
+1. **Fork** `jeppeFQ/BID-workshop-projekt` på GitHub, og **clone** jeres fork (ikke originalen) i VS Code ([lektion 3](../lektioner/03-git-og-versionskontrol/index.qmd)).
+2. Når der kommer nyt i originalen, som `KOEREPLAN.md` i lektion 5: **Sync fork** på jeres forks side, og derefter **Pull** i VS Code.
+3. Lav dagens arbejde i en **branch**, push den løbende, og merge den ind i `main`, når arbejdet er færdigt ([lektion 6](../lektioner/06-python-workshop/index.qmd)).
+4. Commit og push, inden I går.
+
+`KOEREPLAN.md` siger, hvad produktet er, hvilke lag det består af, og hvad klasserne hedder. Alt, der **ikke** står i den, bestemmer I selv.
+
+## Forløbet
+
+| Lektion | Det, I lærte | Det, det blev til i barometeret |
+|---|---|---|
+| [1](../lektioner/01-computere-algoritmer-og-python/index.qmd) | Alt er tal. En regel kan blive til et program | — |
+| [2](../lektioner/02-intro-til-python/index.qmd) | Python | værktøjet |
+| [3](../lektioner/03-git-og-versionskontrol/index.qmd) | Git, forks, merge | jeres fælles repository |
+| [4](../lektioner/04-paradigmer-og-algoritmer/index.qmd) | Dekomposition, abstraktion og grænseflader | `DESIGN.md`, `python/barometer.py` |
+| [5](../lektioner/05-softwaredesign/index.qmd) | Klasser og design | `Arbejdsplads`, `Referencetal`, `DESIGN.md` |
+| [6](../lektioner/06-python-workshop/index.qmd) | Workshop | figuren, beskeden, opslaget, appen |
+| [8](../lektioner/08-sql-og-databaser/index.qmd) | SQL, databaser og API'er | `data/` som en database uden server |
+| [9](../lektioner/09-plain-text-compilere-og-markup/index.qmd) | Plain text og markup | hjemmesiden |
+
+Det, I har bygget: en **kerne** i ren Python, en **app** og en **hjemmeside** på nettet, og et **designdokument**, hvor beslutningerne står.

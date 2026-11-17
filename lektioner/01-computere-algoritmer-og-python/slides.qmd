@@ -1,0 +1,1397 @@
+---
+title: "Computere, algoritmer og Python"
+subtitle: "Lektion 01"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: lyseblaa
+pyodide:
+  packages:
+    - numpy
+    - pandas
+    - matplotlib
+---
+
+## I dag
+
+1. **Hvem er jeg, og hvem er I?**
+2. **Modulet.** Hvad skal vi lære, og hvordan?
+3. **Maskinen.** Hvad er en computer (*hardware*)?
+4. **Koden.** Hvad er kode og kodning (*software*)?
+5. **Workshop.** Vi installerer Python og møder kommandolinjen.
+
+```{pyodide}
+#| autorun: true
+#| include: false
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+tilfaeldig = np.random.default_rng(42)
+
+data = pd.DataFrame({
+    "maaned": list(range(1, 13)) * 3,
+    "butik": ["Aalborg"] * 12 + ["Aarhus"] * 12 + ["København"] * 12,
+    "salg": tilfaeldig.integers(4_000, 16_000, 36),
+})
+```
+
+## Hvem er jeg?
+
+**Jeppe Fjeldgaard Qvist**
+
+- Kandidat i **samfundsfag og geografi** (AAU)
+- **Ph.d.** fra Institut for Politik og Samfund (AAU)
+- **Postdoc** ved Samfund og Politik (AAU)
+
+Jeg underviser **her** og på specialiseringen **Social Data Science**, og jeg forsker i **diversitet på arbejdsmarkedet**.
+
+## Udvikling af IT (1-BID)
+
+Modulet introducerer **grundlæggende computerteknologi og dens rolle og betydning i samfundet**: de teknologier og principper, der ligger til grund for moderne IT-systemers design og funktion.
+
+I bliver også introduceret til **grundlæggende programmering**, til den software, man bruger, når man programmerer, og til grundlæggende principper for softwaredesign.
+
+## Det skal I kunne bagefter
+
+::::: {.trin-kort}
+:::: {.kol}
+Viden
+
+Teori, metoder og praksis for design, programmering og test af software, i den private og den offentlige sektor.
+::::
+
+:::: {.kol}
+Færdigheder
+
+**Anvende** principperne, **vurdere** løsninger og **formidle** tekniske problemer og risici, også til folk uden teknisk baggrund.
+::::
+
+:::: {.kol}
+Kompetencer
+
+Håndtere teknisk komplekse projekter, indgå i tværfaglige projektgrupper og forbedre egen arbejdspraksis.
+::::
+:::::
+
+::: {.lille}
+Kort fortalt. De fulde læringsmål fra studieordningen står under [Om kurset](../../kursus/om-kurset.html).
+:::
+
+## Kursusgange og sammenhæng
+
+:::: {.to-kol .bred-smal}
+::: {.kol}
+1. **Computere, algoritmer og Python**
+2. Python-workshop
+3. Git og versionskontrol
+4. Programmeringsparadigmer og algoritmer
+5. Softwaredesign
+6. Python-workshop
+7. Machine learning og kunstig intelligens
+8. SQL og databaser
+9. Plain text, compilere og markup
+10. Chatbots, NLP og ChatGPT
+:::
+
+::: {.kol}
+**Arbejdsform**
+
+- Interaktion og **dialog**
+- **Gruppearbejde** til workshops
+- Et mini-projekt, der vokser fra gang til gang
+:::
+::::
+
+## Grundbøger og litteratur
+
+:::: {.to-kol}
+::: {.kol}
+**Grundbøger**
+
+- Kernighan (2021): *Understanding the Digital World*, 2. udgave. Kan købes hos Faktum.
+- Downey (2024): [*Think Python*](https://allendowney.github.io/ThinkPython/index.html), 3. udgave. Ligger frit online.
+
+> Det forventes, at I læser **inden** forelæsningen.
+:::
+
+::: {.kol}
+**Til i dag**
+
+- Studieordningen for modulet og kursusbeskrivelsen
+- Kernighan, kapitel 1, 2 og 3
+- Downey: læs forordet, og orientér jer i bogen
+:::
+::::
+
+::: {.lille}
+Kapitlerne i Downey følger progressionen fra gang til gang og opdateres løbende på lektionens side.
+:::
+
+## Innovation og *digitalisering*
+
+- Hvad tænker I på, når I hører ordet **digitalisering**?
+- Giv ét konkret eksempel på et IT-system, I selv har brugt. Hvad gjorde det **let**, og hvad gjorde det **svært**?
+- Hvem besluttede, hvordan det system skulle virke? Og hvad skulle man vide for at kunne stille kritiske spørgsmål til den beslutning?
+
+[10 min]{.timer tid=600}
+
+::: {.fragment}
+Det sidste spørgsmål er hele pointen med modulet: **I skal kunne stille kvalificerede spørgsmål til teknologien.** Det kræver, at I ved, hvad der foregår indeni.
+:::
+
+# Maskinen
+
+Fire dele og én ledning. Det er (næsten) det hele.
+
+## Computeren
+
+I har alle sammen en. Men hvad er det *egentlig* for noget?
+
+> Forestil jer en bedsteforælder, der aldrig har set en computer. **Hvordan ville I forklare, hvad det er?**
+
+[5 min]{.timer tid=300}
+
+::: {.lille}
+Stærkt anbefalet skønlitteratur: Labatut, B. (2024). *Maniac*. C & K.
+:::
+
+## Von Neumann-arkitekturen
+
+:::: {.to-kol}
+::: {.kol}
+> "Hardware is the solid, visible part of computing: devices and equipment that you can see and put your hands on." (Kernighan 2021, 7)
+
+I sin essens: **fire dele, forbundet af én ledning.**
+
+De næste fire slides tager én del ad gangen.
+:::
+
+::: {.figur figur="arkitektur" fokus="alle"}
+:::
+::::
+
+## Hardware (1): processoren
+
+:::: {.to-kol}
+::: {.kol}
+**CPU'en** har et repertoire af basale operationer:
+
+- **regne** (ALU'en)
+- **flytte** data
+- **styre** og afkode, hvad de andre dele skal gøre (kontrolenheden)
+
+Den udfører dem *milliarder* af gange i sekundet. 2,2 GHz er 2.200.000.000 *tik* i sekundet.
+:::
+
+::: {.figur figur="arkitektur" fokus="cpu"}
+:::
+::::
+
+## Hardware (2): den primære hukommelse
+
+:::: {.to-kol}
+::: {.kol}
+**RAM** er den *primære* hukommelse:
+
+- Det, processoren arbejder med **lige nu**. Indholdet kan ændres hele tiden.
+- Mere RAM betyder, at computeren kan lave mere på samme tid.
+- **Volatil:** når I slukker, er det væk.
+- Måles i *bytes*. 8 GB er 8.000.000.000 bytes.
+:::
+
+::: {.figur figur="arkitektur" fokus="ram"}
+:::
+::::
+
+## Hardware (3): den sekundære hukommelse
+
+:::: {.to-kol}
+::: {.kol}
+**Disken** er den *sekundære* hukommelse:
+
+- Gemmer det, der skal blive, **efter** computeren er slukket.
+- En *harddisk* eller en *SSD* (solid state drive).
+- Indholdet præsenteres som mapper og filer: **filsystemet**.
+
+Filsystemet er en *præsentation*. Senere i dag går vi ind til den samme disk ad en anden dør: **kommandolinjen**.
+:::
+
+::: {.figur figur="arkitektur" fokus="disk"}
+:::
+::::
+
+## Hardware (4): bussen
+
+:::: {.to-kol}
+::: {.kol}
+**Bussen** forbinder det hele. Den har tre spor:
+
+- **Adresser:** hvor i hukommelsen? Kun CPU'en sender adresser.
+- **Data:** selve indholdet. Kan gå begge veje.
+- **Kontrolsignaler:** læs, skriv, takt, afbryd.
+
+**Flaskehalsen:** kun én del kan bruge bussen ad gangen. CPU'en må ofte vente på den langsommere hukommelse.
+:::
+
+::: {.figur figur="arkitektur" fokus="bus"}
+:::
+::::
+
+# CPU'en
+
+Milliarder af kontakter, der kan være tændt eller slukket.
+
+## Computerens hjerne
+
+En processor er milliarder af transistorer, arrangeret, så de kan tre ting:
+
+1. **Gemme** information
+2. **Behandle** information (ALU'en)
+3. **Styre** dataflowet (kontrolenheden)
+
+::::: {.trin-kort}
+:::: {.kol}
+Transistor
+
+En elektronisk kontakt: tændt eller slukket.
+::::
+
+:::: {.kol}
+Logic gates
+
+Få transistorer sat sammen, så de kan svare på `AND`, `OR` og `NOT`.
+::::
+
+:::: {.kol}
+Processor
+
+Milliarder af gates sat sammen, så de kan regne, flytte og styre.
+::::
+:::::
+
+## Hvad laver den så, helt konkret?
+
+Den henter en instruktion, udfører den og går videre til den næste. Igen og igen. Her en "CPU", der kan fire ting: **hente** et tal, **lægge** et tal til, **gemme** et tal og **stoppe**. Det er nok til at regne 2 + 2.
+
+::: {.figur figur="cpu"}
+:::
+
+## Den samme CPU, skrevet i Python {.kodelab}
+
+En rigtig CPU kan et par hundrede instruktioner i stedet for fire og kører løkken milliarder af gange i sekundet. Idéen er den samme.
+
+:::: {.proev forslag="Sæt tallet på adresse `8196` til `5` i linje 2, og kør igen. Hvad står der nu på plads 8200?"}
+```{pyodide}
+# Hukommelsen: adresser med tal i
+hukommelse = {8192: 2, 8196: 2, 8200: 0}
+
+# Programmet: fire instruktioner
+program = [
+    ("LOAD",  8192),
+    ("ADD",   8196),
+    ("STORE", 8200),
+    ("HALT",  None),
+]
+
+register = 0     # CPU'ens ene lille lomme
+taeller = 0      # hvilken instruktion er vi ved?
+
+while True:
+    instruktion, adresse = program[taeller]      # FETCH
+    print(f"tik {taeller}:  {instruktion:<6} register = {register}")
+
+    if instruktion == "LOAD":                    # DECODE + EXECUTE
+        register = hukommelse[adresse]
+    elif instruktion == "ADD":
+        register = register + hukommelse[adresse]
+    elif instruktion == "STORE":
+        hukommelse[adresse] = register
+    elif instruktion == "HALT":
+        break
+
+    taeller = taeller + 1                        # næste instruktion
+
+print("Hukommelsen på plads 8200:", hukommelse[8200])
+```
+
+::: {.forklaring}
+I skal ikke kunne skrive det her endnu. I skal kunne genkende figuren fra før.
+
+1. {2} Hukommelsen er en *ordbog*: til venstre for kolonet står adressen, til højre det tal, der ligger på den.
+2. {5-10} Programmet er en liste med fire instruktioner. Hver består af et navn og en adresse.
+3. {12-13} `register` er CPU'ens ene lille "lomme". `taeller` holder styr på, hvilken instruktion vi er nået til.
+4. {15} `while True:` betyder *bliv ved*. Alt det indrykkede gentages, indtil programmet selv stopper.
+5. {16} **Hent** (fetch): tag instruktion nummer `taeller` fra programmet.
+6. {19-26} **Afkod og udfør** (decode og execute): `if` og `elif` finder ud af, hvilken instruktion det er, og gør det, den siger.
+7. {26} `break` hopper ud af løkken. Det er `HALT`.
+8. {28} Læg én til tælleren, så næste omgang henter den næste instruktion.
+:::
+::::
+
+## Moore's lov {.kodelab}
+
+Antallet af transistorer på en chip er fordoblet omtrent hvert andet år siden 1971. Det er ikke en naturlov. Det er en observation, som industrien siden har brugt som køreplan.
+
+:::: {.proev forslag="Slet linje 25, `ax.set_yscale(\"log\")`, og kør igen. Hvad sker der med figuren, og hvorfor?"}
+```{pyodide}
+import numpy as np
+import matplotlib.pyplot as plt
+
+aar = [1971, 1978, 1982, 1985, 1989, 1993, 2000,
+       2006, 2012, 2017, 2020, 2022, 2024]
+
+transistorer = [2_300, 29_000, 134_000, 275_000, 1_200_000,
+                3_100_000, 42_000_000, 291_000_000, 1_400_000_000,
+                4_800_000_000, 16_000_000_000, 20_000_000_000,
+                28_000_000_000]
+
+navne = ["4004", "8086", "80286", "80386", "80486", "Pentium",
+         "Pentium 4", "Core 2 Duo", "Ivy Bridge", "Ryzen 7",
+         "M1", "M2", "M4"]
+
+# Hvor hurtigt fordobles det? Vi tilpasser en ret linje til log2
+haeldning, skaering = np.polyfit(aar, np.log2(transistorer), 1)
+print(f"Fordoblingstid: {1 / haeldning:.1f} år")
+print(f"1971 til 2024: {transistorer[-1] / transistorer[0]:,.0f} gange flere")
+
+fig, ax = plt.subplots(figsize=(6, 3.6))
+ax.scatter(aar, transistorer, color="#1f5fbf", zorder=3)
+ax.plot(aar, 2 ** (haeldning * np.array(aar) + skaering),
+        color="#c0392b", linewidth=1)
+ax.set_yscale("log")          # hvert trin på y-aksen er 10 gange flere
+ax.set_xlim(1968, 2032)
+ax.set_xlabel("År")
+ax.set_ylabel("Antal transistorer")
+
+for x, y, navn in zip(aar, transistorer, navne):
+    ax.annotate(navn, (x, y), xytext=(5, -3),
+                textcoords="offset points", fontsize=7)
+
+plt.show()
+```
+
+::: {.forklaring}
+1. {4-14} Tre lister: årstal, antal transistorer og chippens navn. Understregen i `2_300` er kun til for øjnene: Python læser det som 2300.
+2. {17} `np.polyfit` lægger en ret linje gennem punkterne. Vi bruger `np.log2`, fordi en fordobling så bliver til ét trin op.
+3. {18} Linjens hældning er *fordoblinger pr. år*. Vender vi den om, får vi *år pr. fordobling*.
+4. {19} Det sidste tal divideret med det første: så mange gange flere transistorer.
+5. {21-24} Tegn punkterne (blå) og den tilpassede linje (rød).
+6. {25} En **logaritmisk** y-akse: hvert trin opad er 10 gange flere. Uden den ville alle de gamle chips ligge fladt langs bunden.
+7. {30-32} Skriv chippens navn ved hvert punkt.
+:::
+::::
+
+::: {.lille}
+Tal fra producenternes egne opgivelser (jf. Wikipedia, *Transistor count*).
+:::
+
+## Hvad betyder det?
+
+- Kurven siger intet om, hvad computerne *bruges* til. Hvad skal der til ud over transistorer?
+- Fordoblingen er begyndt at flade ud omkring 2016. Hvad så?
+
+[4 min]{.timer tid=240}
+
+# Bits og bytes
+
+Lyd, tekst og billeder skal alt sammen blive til tal, før en computer kan gemme det.
+
+## Digital og analog information {.kodelab}
+
+Verden er analog: lyd er lufttryk, der ændrer sig glidende. Computeren kan kun gemme tal. Så vi **måler** signalet med jævne mellemrum og **runder** hver måling af.
+
+```{ojs}
+//| echo: false
+viewof maalinger = sds1.skyder({ label: "Målinger pr. sekund", min: 4, max: 200, value: 16 })
+viewof antal_bits = sds1.skyder({ label: "Bits pr. måling", min: 1, max: 8, value: 4 })
+```
+
+:::: {.demo}
+```{pyodide}
+#| input:
+#|   - maalinger
+#|   - antal_bits
+import numpy as np
+import matplotlib.pyplot as plt
+
+t = np.linspace(0, 1, 400)
+lyd = np.sin(2 * np.pi * 2 * t)                 # det analoge signal
+
+t_maalt = np.linspace(0, 1, maalinger)
+maalt = np.sin(2 * np.pi * 2 * t_maalt)         # vores målinger
+
+trin = 2 ** antal_bits - 1
+digital = np.round((maalt + 1) / 2 * trin).astype(int)
+
+print("Det er det, computeren gemmer:")
+print(digital)
+
+fig, ax = plt.subplots(figsize=(6, 3.2))
+ax.plot(t, lyd, color="#9a9a9a", label="analogt signal")
+ax.step(t_maalt, digital / trin * 2 - 1, where="post",
+        color="#1f5fbf", label="digitalt")
+ax.scatter(t_maalt, maalt, color="#c0392b", zorder=3, s=18,
+           label="målinger")
+ax.legend(fontsize=8, loc="upper right")
+plt.show()
+```
+
+::: {.forklaring}
+1. {1-2} To biblioteker: `numpy` til at regne og `matplotlib` til at tegne.
+2. {4-5} Det analoge signal: en blød bølge, regnet ud i 400 punkter, så den ser glat ud.
+3. {7-8} Vores **målinger**: vi kigger kun på bølgen `maalinger` gange. Tallet kommer fra den øverste skyder.
+4. {10} Med `antal_bits` bits kan vi skelne mellem 2 opløftet i `antal_bits` forskellige niveauer. Fire bits giver 16 niveauer: 0 til 15. Tallet kommer fra den nederste skyder.
+5. {11} Hver måling rundes af til det nærmeste niveau. Det er **alt**, computeren gemmer.
+6. {13-14} Skriv tallene ud.
+7. {16-23} Tegn den analoge bølge (grå), målingerne (røde prikker) og det, computeren kan genskabe ud fra tallene (blå trappe).
+:::
+::::
+
+::: {.lille}
+Hvornår kan I ikke længere se forskel på den grå og den blå kurve? Det er præcis det valg, en mp3-fil træffer for jer.
+:::
+
+## Bits og bytes (1): otte kontakter
+
+:::: {.to-kol}
+::: {.kol}
+- En **bit** (*binary digit*) er den mindste enhed af information: 0 eller 1.
+- En **byte** er 8 bits. Den er grundenheden i næsten al computerhukommelse.
+- Hver plads er dobbelt så meget værd som den til højre: 1, 2, 4, 8 ...
+
+Tryk på kontakterne. Hvad er det største tal, I kan lave?
+:::
+
+::: {.kol}
+::: {.figur figur="bits" tal="90"}
+:::
+
+En byte kan vise **256** forskellige værdier: 0 til 255.
+:::
+::::
+
+## Bits og bytes (1): det samme i Python {.kodelab}
+
+:::: {.proev forslag="Skift `tal` ud med jeres fødselsår. Hvad sker der ved 255? Og ved 256?"}
+```{pyodide}
+#| autorun: true
+import matplotlib.pyplot as plt
+
+tal = 90
+bits = format(tal, "08b")            # skriv tallet med 8 bits
+pladsvaerdier = [128, 64, 32, 16, 8, 4, 2, 1]
+
+print(tal, "=", bits)
+
+fig, ax = plt.subplots(figsize=(6, 1.9))
+for i, (bit, vaerdi) in enumerate(zip(bits, pladsvaerdier)):
+    taendt = bit == "1"
+    ax.add_patch(plt.Rectangle((i, 0), 1, 1, edgecolor="#1c1c1c",
+                               facecolor="#1f5fbf" if taendt else "white"))
+    ax.text(i + .5, .5, bit, ha="center", va="center", fontsize=15,
+            color="white" if taendt else "#1c1c1c")
+    ax.text(i + .5, -.35, vaerdi, ha="center", fontsize=9, color="#6a6a6a")
+
+regnestykke = " + ".join(str(v) for b, v in zip(bits, pladsvaerdier) if b == "1")
+ax.set_title(f"{regnestykke} = {tal}", fontsize=11)
+ax.set_xlim(-.1, 8.1)
+ax.set_ylim(-.8, 1.1)
+ax.axis("off")
+plt.show()
+```
+
+::: {.forklaring}
+1. {3} Tallet, vi vil se som bits.
+2. {4} `format(tal, "08b")` skriver tallet i totalssystemet (`b` for *binary*) med 8 cifre og nuller foran.
+3. {5} Pladsværdierne, fra venstre mod højre.
+4. {7} Vis tallet og dets otte bits.
+5. {9-16} Tegn otte kasser. En kasse bliver blå, hvis dens bit er `"1"`. Under hver kasse står pladsværdien.
+6. {18-19} Regnestykket i overskriften: læg pladsværdierne for de tændte bits sammen.
+:::
+::::
+
+## Bits og bytes (2): tekst
+
+:::::: {.to-kol }
+::: {.kol}
+Der findes ingen bogstaver i en computer. Der findes et **nummer** for hvert tegn og en **aftale** om, hvilket nummer der betyder hvad.
+
+::: {.figur figur="tegn" tekst="Hej Ø"}
+:::
+:::
+
+::::::: {.kol}
+:::: {.proev .stak forslag="Skriv jeres eget navn i linje 5."}
+```{pyodide}
+#| autorun: true
+print("A er nummer", ord("A"), "=", format(ord("A"), "08b"))
+print("a er nummer", ord("a"), "=", format(ord("a"), "08b"))
+print()
+
+tekst = "Hej Ø"
+
+for tegn in tekst:
+    print(f"{tegn!r:>5}  nummer {ord(tegn):>5}   bytes: {list(tegn.encode('utf-8'))}")
+
+print()
+print("Tegn i teksten:", len(tekst))
+print("Bytes på disken:", len(tekst.encode("utf-8")))
+```
+
+::: {.forklaring}
+1. {1-2} `ord("A")` giver tegnets nummer. `format(..., "08b")` viser det samme nummer som otte bits.
+2. {5} En kort tekst med et dansk bogstav.
+3. {7-8} En løkke: for hvert tegn i teksten vises tegnet, dets nummer og de bytes, det fylder på disken.
+4. {11} `len(tekst)` tæller **tegn**.
+5. {12} `tekst.encode("utf-8")` laver teksten om til bytes. Dem er der flere af, fordi `Ø` fylder to.
+:::
+::::
+:::::::
+::::::
+
+::: {.incremental}
+- `A` og `a` er to helt forskellige tal. Derfor er `"Hej" == "hej"` falsk.
+- **Æ, Ø og Å fylder to bytes.** Derfor bliver danske tegn til `Ã¦` og `Ã¸`, når to programmer er uenige om aftalen. I kommer til at møde det igen, sandsynligvis på et ubelejligt tidspunkt.
+:::
+
+## Bits og bytes (3): hvor meget fylder det? {.kodelab}
+
+Alt måles i bytes: **KB**, **MB**, **GB**, **TB**. Regn selv efter i stedet for at slå det op.
+
+:::: {.proev forslag="Hvor meget fylder et foto på 48 megapixel? Ret linje 6."}
+```{pyodide}
+#| autorun: true
+import matplotlib.pyplot as plt
+
+et_tegn = 1
+en_sms = 160 * 1                       # 160 tegn
+en_side_tekst = 2_400 * 1              # ca. 2.000 tegn
+et_foto = 4032 * 3024 * 3              # 12 megapixel, 3 bytes pr. pixel
+en_time_video = 5_000_000 / 8 * 60 * 60   # 5 Mbit i sekundet, i en time
+
+ting = {
+    "Ét tegn": et_tegn,
+    "En sms (160 tegn)": en_sms,
+    "En side tekst (2400 tegn)": en_side_tekst,
+    "Et 12 MB foto": et_foto,
+    "En time video": en_time_video,
+}
+
+for navn, antal_bytes in ting.items():
+    print(f"{navn:<16} {antal_bytes:>16,.0f} bytes")
+
+fig, ax = plt.subplots(figsize=(6, 3))
+ax.barh(list(ting.keys()), list(ting.values()), color="#1f5fbf")
+ax.set_xscale("log")
+ax.set_xlabel("Bytes (log-skala)")
+plt.show()
+```
+
+::: {.forklaring}
+1. {3-5} Tekst: ét tegn fylder (cirka) én byte, så en sms på 160 tegn fylder 160 bytes.
+2. {6} Et foto: bredde gange højde er antallet af pixels. Hver pixel fylder 3 bytes (rød, grøn og blå).
+3. {7} Video: 5 millioner bits i sekundet. Divider med 8 for at få bytes, og gang med 60 · 60 sekunder.
+4. {9-15} En *ordbog* samler de fem ting: navnet til venstre for kolonet, antallet af bytes til højre.
+5. {17-18} Skriv hver ting ud. `:,` i formatet sætter tusindtalsseparatorer i tallet.
+6. {20-24} Et søjlediagram med logaritmisk x-akse, ellers ville videoen få alt andet til at forsvinde.
+:::
+::::
+
+::: {.lille}
+Fotoet og videoen er *uden* komprimering. Et rigtigt JPEG fylder omtrent en tiendedel. Komprimering handler om at fjerne det, øjet og øret alligevel ikke opfatter.
+:::
+
+## Bits og bytes (4): billeder {.kodelab}
+
+Et digitalt billede er en tabel af tal. I gråtoner er det ét tal pr. pixel: 0 er sort, 255 er hvidt.
+
+:::: {.proev forslag="Skriv jeres eget mønster ind i linje 5 til 7, og kør igen."}
+```{pyodide}
+#| autorun: true
+import numpy as np
+import matplotlib.pyplot as plt
+
+billede = np.array([
+    [  0, 255,   0],
+    [255, 128, 255],
+    [  0, 255,   0],
+], dtype=np.uint8)          # uint8 = ét tal fylder én byte
+
+print("Form:", billede.shape)
+print("Fylder:", billede.nbytes, "bytes")
+
+fig, ax = plt.subplots(figsize=(3.4, 3.4))
+ax.imshow(billede, cmap="gray", vmin=0, vmax=255)
+
+for (raekke, kolonne), vaerdi in np.ndenumerate(billede):
+    ax.text(kolonne, raekke, vaerdi, ha="center", va="center",
+            color="#c0392b", fontsize=13)
+
+ax.axis("off")
+plt.show()
+```
+
+::: {.forklaring}
+1. {4-8} En tabel med 3 rækker og 3 kolonner. `dtype=np.uint8` betyder, at hvert tal fylder præcis én byte (0 til 255).
+2. {10} `.shape` er tabellens form: (rækker, kolonner).
+3. {11} `.nbytes` er, hvor meget den fylder: 9 tal, 9 bytes.
+4. {13-14} `imshow` viser tabellen som et billede. `cmap="gray"` oversætter 0 til sort og 255 til hvidt.
+5. {16-18} Skriv hvert tal oven på sin pixel.
+:::
+::::
+
+::: {.lille}
+Tabellen i koden og billedet i outputtet er **det samme**.
+:::
+
+## Bits og bytes (5): farver {.kodelab}
+
+Farver kræver tre tal pr. pixel: **rød, grøn og blå**. Hver er 0 til 255, altså én byte. Tre bytes pr. pixel er 24 bit.
+
+:::: {.proev forslag="Skriv `[0, 255, 255]` ind i stedet for en af farverne i linje 5, og kør." gaet="Gul er rød + grøn. Hvad giver [0, 255, 255]?" valg="lilla|turkis|orange"}
+```{pyodide}
+#| autorun: true
+import numpy as np
+import matplotlib.pyplot as plt
+
+billede = np.array([
+    [[255, 0, 0], [0, 255, 0], [0, 0, 255]],
+    [[255, 255, 255], [0, 0, 0], [255, 255, 0]],
+], dtype=np.uint8)
+
+print("Form (rækker, kolonner, farvekanaler):", billede.shape)
+print("Fylder:", billede.nbytes, "bytes")
+print("Pixel øverst til venstre:", billede[0, 0])
+
+fig, ax = plt.subplots(figsize=(4.4, 3.0))
+ax.imshow(billede)
+
+for (raekke, kolonne), _ in np.ndenumerate(billede[:, :, 0]):
+    lys = billede[raekke, kolonne].mean() > 127
+    ax.text(kolonne, raekke, str(tuple(billede[raekke, kolonne])),
+            ha="center", va="center", fontsize=7,
+            color="#333333" if lys else "white")
+
+ax.axis("off")
+plt.show()
+```
+
+::: {.forklaring}
+1. {4-7} Nu har hver pixel **tre** tal i en firkantet parentes: rød, grøn, blå. `[255, 0, 0]` er ren rød.
+2. {9} Formen har fået en tredje dimension: (rækker, kolonner, farvekanaler).
+3. {10} 2 · 3 pixels med 3 bytes hver: 18 bytes.
+4. {11} `billede[0, 0]` er pixlen i række 0, kolonne 0. Python tæller fra 0.
+5. {13-20} Vis billedet, og skriv de tre tal oven på hver pixel.
+:::
+::::
+
+## {.udsagn}
+
+Alt er **tal**.
+
+Lyd er tal. Tekst er tal. Billeder er tal. Video er billeder, altså tal.
+
+- Hele resten af modulet hviler på det: **når alting er tal, kan alting behandles med den samme slags maskine**, og endda med de samme metoder.
+- Det er også dér, problemerne begynder. Når et menneske bliver til rækker af tal i et register, er noget gået tabt undervejs. Det vender vi tilbage til.
+
+# Kode?!
+
+En meget detaljeret opskrift, som en maskine kan følge.
+
+## Erfaring?
+
+- Hvad er jeres erfaring, hvis I har nogen?
+- Hvordan forstår I "kodning"? Hvorfor bruger vi ikke bare Excel?
+- Hvis I har erfaring: var den god? Hvordan lærte I det bedst, og hvad var svært?
+
+[5 min]{.timer tid=300}
+
+## Dataanalyse som case: kode eller Excel?
+
+:::: {.to-kol}
+::: {.kol}
+**Når Excel kommer til kort**
+
+- Analysere 100.000-vis af rækker.
+- Gentage den samme analyse hver dag, måned eller år med nye data. I Excel skal alle klik gentages.
+- Dokumentere præcist, hvad vi har gjort, så en kollega kan gentage det.
+- Kombinere data fra mange kilder.
+- Lave avancerede statistiske modeller.
+:::
+
+::: {.kol}
+**Peg og klik**
+
+"Bland ingredienserne."
+
+**Kode**
+
+"Tag 500 g mel. Tilsæt 3 dl vand. Rør i 2 minutter."
+
+Kode er en *meget detaljeret* opskrift. Derfor er den **reproducerbar**, **skalerbar**, **fleksibel** og kan **automatiseres**.
+:::
+::::
+
+## Først idéen: del op, regn, saml
+
+::: {.figur figur="gruppe" kol="maaned,salg" raekker="1,5071;2,13287;1,12829;2,13133;1,13378;2,11726"}
+:::
+
+Hvad er det gennemsnitlige salg i hver måned? Her de to første måneder fra tre butikker. Tryk *Næste trin*.
+
+## Så koden: den samme idé på én linje {.kodelab}
+
+:::: {.proev forslag="Skift `.mean()` ud med `.max()` i linje 7. Hvad viser tabellen nu?"}
+```{pyodide}
+import pandas as pd
+
+# 36 rækker: tre butikker, tolv måneder
+print(data.head())
+
+# Beregn gennemsnit for hver måned
+maanedsgennemsnit = data.groupby("maaned")["salg"].mean()
+
+print()
+print(maanedsgennemsnit.round(0))
+```
+
+::: {.forklaring}
+I skal ikke kunne skrive det her endnu. I skal kunne se, at koden er en opskrift.
+
+1. {1} `import pandas as pd` henter **biblioteket** pandas: en værktøjskasse til tabeller, som andre har skrevet. `pd` er et kort kaldenavn.
+2. {4} `data.head()` viser de første fem rækker af tabellen, så vi kan se, hvad vi har med at gøre.
+3. {7} De tre trin fra figuren: `groupby("maaned")` deler rækkerne op efter måned, `["salg"]` vælger kolonnen, og `.mean()` regner gennemsnittet ud i hver gruppe.
+4. {9-10} Vis resultatet, afrundet til hele kroner.
+:::
+::::
+
+::: {.lille}
+`data` blev indlæst, da siden blev hentet. Fra lektion 2 henter vi selv data fra en fil: `data = pd.read_csv("salgstal.csv")`.
+:::
+
+## Den samme opgave som en figur {.kodelab}
+
+Et par linjer mere, og vi kan *se* det i stedet for at læse det.
+
+:::: {.proev forslag="Skift `ax.bar` ud med `ax.plot` i linje 6."}
+```{pyodide}
+import matplotlib.pyplot as plt
+
+maanedsgennemsnit = data.groupby("maaned")["salg"].mean()
+
+fig, ax = plt.subplots(figsize=(6, 3.2))
+ax.bar(maanedsgennemsnit.index, maanedsgennemsnit.values, color="#1f5fbf")
+ax.set_xticks(range(1, 13))
+ax.set_xlabel("Måned")
+ax.set_ylabel("Gennemsnitligt salg (kr.)")
+plt.show()
+```
+
+::: {.forklaring}
+1. {1} `matplotlib` er biblioteket, der tegner figurer.
+2. {3} Den samme beregning som før.
+3. {5} Lav en tom figur. `figsize` er bredde og højde.
+4. {6} `ax.bar` tegner søjler: månederne hen ad x-aksen, gennemsnittene op ad y-aksen.
+5. {7-9} Tal og tekst på akserne.
+6. {10} `plt.show()` viser figuren.
+:::
+::::
+
+## Reproducerbar
+
+> "Hvordan fik du resultatet?"
+
+```python
+maanedsgennemsnit = data.groupby("maaned")["salg"].mean()
+```
+
+Koden er en komplet **log** over, hvad I har gjort ved data for at få jeres resultat.
+
+Når næste års data kommer, ændrer I filnavnet og kører det hele igen.
+
+## Skalerbar {.kodelab}
+
+Den samme kode, der virker på 100 rækker, virker på millioner.
+
+:::: {.demo}
+```{pyodide}
+#| autorun: true
+import time
+import numpy as np
+
+for antal in [100, 10_000, 1_000_000]:
+    tal = np.random.default_rng(0).integers(0, 100, antal)
+
+    start = time.time()
+    gennemsnit = tal.mean()               # selve arbejdet
+    millisekunder = (time.time() - start) * 1000
+
+    print(f"{antal:>10,} rækker: {millisekunder:7.2f} ms   "
+          f"(gennemsnit {gennemsnit:.1f})")
+```
+
+::: {.forklaring}
+1. {4} En løkke: gør det samme for 100, 10.000 og 1.000.000 rækker.
+2. {5} Lav så mange tilfældige tal mellem 0 og 99.
+3. {7-9} Tag tid: se på uret, regn gennemsnittet ud, og se på uret igen. Forskellen ganges med 1000, så vi får millisekunder.
+4. {11-12} Skriv antallet, tiden og gennemsnittet ud på én linje.
+:::
+::::
+
+::: {.lille}
+10.000 gange så mange rækker koster ikke 10.000 gange så lang tid. Og bemærk: det her kører i jeres *browser*.
+:::
+
+## Fleksibel, automatisk og utvetydig
+
+::::: {.trin-kort}
+:::: {.kol}
+Fleksibel
+
+Python har tusindvis af specialiserede *biblioteker*: fra grundlæggende statistik til machine learning og kunstig intelligens.
+::::
+
+:::: {.kol}
+Automatisk
+
+Skriv koden én gang. Kør den hver dag, uge, måned eller år.
+::::
+
+:::: {.kol}
+Utvetydig
+
+Kodning er kommunikation med en maskine. Den forstår os kun, hvis vi er præcise og logisk strukturerede.
+::::
+:::::
+
+## Hvorfor Python?
+
+- (Relativt) simpelt at lære.
+- En meget stor brugerbase: der findes næsten altid et svar på jeres spørgsmål.
+- Omfattende biblioteker til alle udviklings- og forskningsområder.
+
+## Fra tanke til handling i fire niveauer
+
+::::: {.trin-kort}
+:::: {.kol}
+1 · Tanke
+
+"Jeg vil finde gennemsnittet af mine salgstal."
+::::
+
+:::: {.fragment}
+2 · [Algoritme]{.ord}
+
+"Læg alle tallene sammen, og divider med antallet."
+::::
+
+:::: {.fragment}
+3 · Kode
+
+```python
+sum(tal) / len(tal)
+```
+::::
+
+:::: {.fragment}
+4 · Maskinsprog
+
+```
+10110000 01100001
+```
+::::
+:::::
+
+::: {.fragment}
+Niveau 2 skrevet som formel:
+
+$$\bar{x} = \frac{x_1 + x_2 + \ldots + x_n}{n} = \frac{\sum_{i=1}^{n} x_i}{n}$$
+:::
+
+## Niveau 3: algoritmen som Python-kode {.kodelab}
+
+:::: {.proev forslag="Sammenlign med `data[\"salg\"].mean()`. Får I det samme?"}
+```{pyodide}
+total = sum(data["salg"])
+
+gennemsnit = total / len(data["salg"])
+
+print(f"Total salg: {total}")
+print(f"Gennemsnit: {gennemsnit:.1f}")
+```
+
+::: {.forklaring}
+1. {1} `sum(...)` lægger alle tallene i kolonnen `salg` sammen: første trin i algoritmen.
+2. {3} `len(...)` tæller, hvor mange tal der er. `/` dividerer: andet trin.
+3. {5-6} Skriv de to tal ud. `{gennemsnit:.1f}` betyder: vis tallet med én decimal.
+:::
+::::
+
+::: {.lille}
+Linje 1 er tælleren i formlen: summen af alle salgstal. Linje 3 dividerer med *n*, antallet af salgstal.
+:::
+
+## Niveau 4: maskinen forstår ikke Python
+
+:::: {.to-kol}
+::: {.kol}
+Maskinen forstår ikke Python.
+
+- CPU'en forstår kun **maskinkode**: instruktioner af 1-taller og 0'er.
+- **Python-fortolkeren** oversætter jeres kode til noget, maskinen kan udføre.
+- Mellemformen (assembly) er *meget* mere besværlig at skrive end Python.
+
+Mellemniveauet er præcis den lille CPU fra før: `LOAD`, `ADD`, `STORE`, `HALT`.
+:::
+
+::: {.kol}
+**Højt niveau:** det, I skriver
+
+```python
+gennemsnit = total / len(data)
+```
+
+**Mellemniveau:** det, fortolkeren laver
+
+```
+LOAD data
+ADD all values
+DIVIDE by count
+STORE result
+```
+
+**Lavt niveau:** det, CPU'en får
+
+```
+10110000 01100001
+```
+:::
+::::
+
+## Præcision er nøglen
+
+> "Kan du hente en kop kaffe?"
+
+Vi forstår det underforståede: *gå ud i køkkenet, tag en kop, hæld kaffe i, kom tilbage.* En maskine skal have hvert trin for sig:
+
+::: {.incremental}
+1. `kop = hent_kop_fra_koekkenet()`
+2. `kaffe = haeld_kaffe(kop)`
+3. `returner_til_skrivebord(kop)`
+:::
+
+## Præcise instrukser
+
+> Hvilke måneder har et gennemsnitligt salg over 10.000 kr.?
+
+:::: {.to-kol}
+::: {.kol}
+**Som opskrift**
+
+1. Tag det første tal fra listen.
+2. Er det større end 10.000? Hvis ja: skriv det ud.
+3. Tag det næste tal.
+4. Gentag, indtil listen er tom.
+:::
+
+::: {.kol}
+**Næsten som kode**
+
+```
+for hver måned i salgstallene:
+    hvis salget er større end 10000:
+        udskriv måneden
+```
+:::
+::::
+
+## Opskriften som kode {.kodelab}
+
+:::: {.proev forslag="Skift `10_000` ud med `12_000` i linje 6, 10 og 13. Hvor mange måneder er tilbage?"}
+```{pyodide}
+import matplotlib.pyplot as plt
+
+maanedsgennemsnit = data.groupby("maaned")["salg"].mean()
+
+for maaned, salg in maanedsgennemsnit.items():
+    if salg > 10_000:
+        print(f"Måned {maaned}: {salg:.0f} kr.")
+
+fig, ax = plt.subplots(figsize=(6, 3))
+farver = ["#c0392b" if salg > 10_000 else "#cccccc"
+          for salg in maanedsgennemsnit]
+ax.bar(maanedsgennemsnit.index, maanedsgennemsnit.values, color=farver)
+ax.axhline(10_000, color="#1c1c1c", linewidth=1, linestyle="--")
+ax.set_xticks(range(1, 13))
+ax.set_xlabel("Måned")
+ax.set_ylabel("Gennemsnitligt salg (kr.)")
+plt.show()
+```
+
+::: {.forklaring}
+1. {3} Gennemsnittet pr. måned, som før.
+2. {5} `for ... in ...:` er en **løkke**. Den tager én måned ad gangen og kalder månedens nummer `maaned` og dens tal `salg`.
+3. {6} `if salg > 10_000:` stiller et ja/nej-spørgsmål. Kun hvis svaret er ja, køres linjen under.
+4. {7} Skriv måneden og salget ud.
+5. {9-12} Den samme betingelse bruges til at farve søjlerne: rød, hvis salget er over grænsen, ellers grå.
+6. {13} En stiplet linje ved grænsen.
+:::
+::::
+
+## Variable: Pythons hukommelse
+
+:::::: {.to-kol }
+::: {.kol}
+`data` har virket flere steder i koden, selvom vi kun indlæste den én gang. Det er den samme **RAM** som før, set fra Pythons side.
+
+::: {.figur figur="variabel" navne="pris,moms,total" vaerdier="100,25.0,125.0"}
+:::
+
+Maskinen er ligeglad med, om navnene giver mening. Vi bruger **meningsfulde navne** for at kunne forstå vores egen kode.
+:::
+
+::::::: {.kol}
+:::: {.proev .stak forslag="Sæt `pris = 200`, og kør igen. Alle tre tal følger med."}
+```{pyodide}
+pris = 100
+
+moms = pris * 0.25
+
+total = pris + moms
+
+print(total)
+```
+
+::: {.forklaring}
+1. {1} Tag værdien 100, og gem den i hukommelsen under navnet `pris`. Ét lighedstegn betyder *gem*.
+2. {3} Hent værdien fra `pris`, gang med 0.25, og gem resultatet som `moms`. Python bruger punktum som decimaltegn.
+3. {5} Læg de to sammen, og gem resultatet som `total`.
+4. {7} Vis værdien af `total`.
+:::
+::::
+:::::::
+::::::
+
+## Funktioner: genanvendelige opskrifter
+
+:::::: {.to-kol }
+::: {.kol}
+At **definere en [funktion]{.ord}** svarer til at lære maskinen en ny kommando.
+
+::: {.figur figur="funktion" navn="beregn_moms" ind="pris, moms_sats" ud="momsen"}
+:::
+
+Bagefter kan vi skrive `beregn_moms(tal)`, og maskinen ved præcis, hvad den skal gøre, fordi vi har defineret hvert trin.
+:::
+
+::::::: {.kol}
+:::: {.proev .stak}
+```{pyodide}
+def beregn_moms(pris, moms_sats=0.25):
+    return pris * moms_sats
+```
+
+::: {.forklaring}
+1. {1} `def` definerer en ny funktion med navnet `beregn_moms`. I parentesen står det, den skal have ind. `moms_sats=0.25` er en **standardværdi**: den bruges, hvis I ikke angiver andet.
+2. {2} Den indrykkede linje er opskriften. `return` sender resultatet tilbage til den, der kaldte funktionen.
+
+Der sker ingenting, når cellen køres. Funktionen bliver kun *lært*. Den bliver først udført, når nogen kalder den.
+:::
+::::
+:::::::
+::::::
+
+## Brug funktionen {.kodelab}
+
+Funktionen ligger nu i Pythons hukommelse og kan bruges, så mange gange vi vil.
+
+:::: {.proev forslag="Hvad er momsen af 999 kr.?"}
+```{pyodide}
+print(beregn_moms(12485))
+
+print(beregn_moms(12485, moms_sats=0.12))
+```
+
+::: {.forklaring}
+1. {1} Kald funktionen med ét tal. `moms_sats` er derfor 0.25.
+2. {3} Her angiver vi selv satsen: 12 % i stedet for 25 %.
+:::
+::::
+
+::: {.lille}
+Kør cellen på forrige slide **først**. Rækkefølgen betyder noget: Python kender kun det, den allerede har fået at vide.
+:::
+
+## {.udsagn}
+
+Maskiner er "dumme", men **utroligt hurtige og pålidelige**.
+
+De kan gemme tal, sammenligne værdier, hoppe rundt i koden og gentage instruktioner. Milliarder af gange i sekundet, uden fejl.
+
+**Kodningens kunst** er at bryde et komplekst, menneskeligt problem ned til de simple operationer og sætte dem sammen igen til en løsning.
+
+# Hvad kan man bygge med det?
+
+To eksempler: et spil og en afgørelse om et menneske.
+
+## Snake er bare en tabel og en liste
+
+:::: {.to-kol}
+::: {.figur figur="slange"}
+:::
+
+::: {.kol}
+Husk gråtonebilledet: en tabel af tal. Spillebrættet er det samme.
+
+- Slangen er en **liste af koordinater**. Hovedet er det sidste element.
+- **Ét skridt:** sæt et nyt hoved på forrest, og fjern halen.
+- **Æblet:** rammer hovedet æblet, beholder slangen halen. Så vokser den.
+
+Tryk *Ét skridt*, og følg listen under brættet.
+:::
+::::
+
+## Snake i Python {.kodelab}
+
+Otte linjer logik (linje 27 til 34). Resten er tegning.
+
+:::: {.proev forslag="Sæt `retning = (-1, 0)` i linje 9, og kør igen."}
+```{pyodide}
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+
+farver = ListedColormap(["white", "#2b6a4d", "#c0392b"])
+
+slange = [(6, 3), (6, 4), (6, 5)]     # hovedet er sidste element
+aeble = (6, 8)
+retning = (0, 1)                      # (række, kolonne): mod højre
+
+fig, akser = plt.subplots(1, 4, figsize=(8, 2.3))
+
+for ax in akser:
+    bane = np.zeros((12, 12), dtype=np.uint8)     # tomt bræt
+    for raekke, kolonne in slange:
+        bane[raekke, kolonne] = 1                 # slangens krop
+    bane[aeble] = 2                               # æblet
+
+    ax.imshow(bane, cmap=farver, vmin=0, vmax=2)
+    ax.set_xticks(np.arange(-.5, 12), minor=True)
+    ax.set_yticks(np.arange(-.5, 12), minor=True)
+    ax.grid(which="minor", color="#e8e8e8", linewidth=.5)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.tick_params(which="both", length=0)
+
+    # ét skridt: sæt et nyt hoved på forrest
+    hoved = (slange[-1][0] + retning[0], slange[-1][1] + retning[1])
+    slange.append(hoved)
+
+    if hoved == aeble:
+        aeble = (2, 8)          # spist: slangen beholder halen og vokser
+    else:
+        slange.pop(0)           # ikke spist: halen falder af
+
+plt.show()
+print("Slangen er nu", len(slange), "felter lang")
+```
+
+::: {.forklaring}
+1. {7-9} Spillets tilstand: slangens felter som (række, kolonne), æblets plads og retningen. `(0, 1)` betyder 0 rækker ned og 1 kolonne til højre.
+2. {11} Fire billeder ved siden af hinanden: ét for hvert skridt.
+3. {14-17} Byg brættet: en tabel med 12 · 12 nuller. Sæt 1 der, hvor slangen er, og 2 der, hvor æblet er.
+4. {19-25} Tegn tabellen som et billede med tre farver.
+5. {28-29} **Ét skridt:** det nye hoved er det gamle hoved plus retningen. `append` sætter det bagest i listen.
+6. {31-34} Har hovedet ramt æblet, flytter æblet, og slangen beholder sin hale. Ellers fjerner `pop(0)` det første element: halen.
+:::
+::::
+
+## Fra regel til program {.kodelab}
+
+En kommunal regel, skrevet som Python. Koden *er* det program, der træffer afgørelsen.
+
+:::: {.proev forslag="Familie B får afslag. Sæt `INDKOMSTGRAENSE` op til `320000` i linje 1, og kør igen."}
+```{pyodide}
+INDKOMSTGRAENSE = 300000      # kr. om året. Tallet står i reglen (§ 4)
+
+def vurder(indkomst, boern):
+    if indkomst < INDKOMSTGRAENSE and boern > 0:
+        return "Bevilget"
+    return "Afslag"
+
+familier = {
+    "Familie A": {"indkomst": 240000, "boern": 2},
+    "Familie B": {"indkomst": 310000, "boern": 1},
+    "Familie C": {"indkomst": 280000, "boern": 0},
+}
+
+for navn, familie in familier.items():
+    print(navn, "→", vurder(familie["indkomst"], familie["boern"]))
+```
+
+::: {.forklaring}
+1. {1} Grænsen fra reglen, gemt under et navn. Store bogstaver er en konvention for tal, der ikke ændrer sig, mens programmet kører.
+2. {3-6} Selve reglen som en funktion: er indkomsten under grænsen, **og** er der mindst ét barn, er svaret "Bevilget". Ellers "Afslag".
+3. {8-12} Tre opdigtede familier med hver deres indkomst og antal børn.
+4. {14-15} Løkken sender én familie ad gangen gennem reglen og skriver afgørelsen ud.
+:::
+::::
+
+## Det, I lige så
+
+- En **regel** blev til **kode**, og koden blev til et **program**, der træffer en afgørelse om et menneske.
+- Da vi flyttede ét tal i koden, skiftede afgørelsen. Ingen sagsbehandler blev spurgt.
+- Nogen har skrevet det tal. Nogen har oversat en lovtekst til `if` og `else`.
+
+::: {.fragment}
+At kunne læse den kode, og se, hvor oversættelsen blev foretaget, er på mange måder kernen i resten af modulet.
+:::
+
+# Workshop: gør maskinen klar
+
+Python, en editor og en terminal. Vi sætter det op sammen.
+
+## Det, vi skal have på plads
+
+::::: {.trin-kort}
+:::: {.kol}
+1 · Python 3
+
+Selve sproget og fortolkeren.
+::::
+
+:::: {.kol}
+2 · En editor
+
+Programmet, I skriver koden i: **VS Code**.
+::::
+
+:::: {.kol}
+3 · En terminal
+
+Vinduet, hvor I taler direkte med maskinen.
+::::
+:::::
+
+Regn med, at det driller for nogen. Det er normalt, og det er derfor, vi gør det sammen. Sæt jer to og to: den, der bliver færdig først, hjælper sidemanden.
+
+## Kommandolinjen: hvorfor overhovedet?
+
+I har allerede set disken i dag. Mapperne på skrivebordet er én **præsentation** af den. Kommandolinjen er en anden.
+
+- Den er **eksplicit**: der sker præcis det, I skriver, og intet andet.
+- Den kan **gentages og deles**: en kommando kan skrives ned, sendes til en kollega og køres igen om et år.
+- Det er sådan, rigtige systemer betjenes. Servere har ikke et skrivebord.
+
+::: {.fragment}
+Det er den samme pointe som kode over for Excel, bare et niveau længere nede.
+:::
+
+## Kommandolinjen i miniature
+
+Prøv kommandoerne her, før I prøver dem i jeres egen terminal. Til venstre er mappetræet, til højre er terminalen. Den markerede mappe er dér, hvor I står.
+
+::: {.figur figur="terminal" trae="Users/jeppe/Desktop/;Users/jeppe/Documents/;Users/jeppe/Downloads/" start="/Users/jeppe" mkdir="1-bid"}
+:::
+
+## De kommandoer, I skal bruge i dag
+
+| Hvad vil du? | macOS (Terminal) | Windows (PowerShell) |
+|---|---|---|
+| Hvor er jeg? | `pwd` | `pwd` |
+| Hvad ligger her? | `ls` | `ls` |
+| Gå ind i en mappe | `cd 1-bid` | `cd 1-bid` |
+| Gå et niveau op | `cd ..` | `cd ..` |
+| Lav en ny mappe | `mkdir 1-bid` | `mkdir 1-bid` |
+| Hvilken Python? | `python3 --version` | `python --version` |
+| Kør et program | `python3 hej.py` | `python hej.py` |
+
+::: {.lille}
+Bemærk `python3` på macOS og `python` på Windows. Det er en klassisk kilde til forvirring.
+:::
+
+## Øvelse 1: find rundt
+
+1. Åbn terminalen. Skriv `pwd`. Hvor er I henne?
+2. Skriv `ls`. Genkender I noget fra jeres skrivebord?
+3. Lav en mappe til kurset: `mkdir 1-bid`
+4. Gå ind i den: `cd 1-bid`
+5. Tjek med `pwd`, at I står det rigtige sted.
+6. Skriv `python3 --version` (eller `python --version`). Hvad svarer den?
+
+[7 min]{.timer tid=420}
+
+::: {.lille}
+Får I `command not found`? Så er Python enten ikke installeret, eller også ved terminalen ikke, hvor den ligger. Ræk hånden op.
+:::
+
+## Øvelse 2: Hello World!
+
+:::::: {.to-kol }
+::: {.kol}
+Det første program, stort set alle programmører nogensinde har skrevet. Det virker i browseren. Nu skal det virke på **jeres egen maskine**:
+
+1. Lav en fil i mappen `1-bid`, og kald den `hej.py`.
+2. Skriv `print("Hello World!")` i den, og gem.
+3. Kør den i terminalen: `python3 hej.py`
+:::
+
+::::::: {.kol}
+:::: {.proev .stak}
+```{pyodide}
+print("Hello World!")
+```
+
+::: {.forklaring}
+1. {1} `print(...)` skriver det, der står i parentesen, ud på skærmen. Anførselstegnene fortæller Python, at det er tekst.
+:::
+::::
+:::::::
+::::::
+
+## Øvelse 3: jeres eget program
+
+Udvid `hej.py`. Kør filen igen efter hver ændring:
+
+```python
+navn = input("Hvad hedder du? ")
+print("Hej " + navn + "!")
+print("Dit navn fylder", len(navn.encode("utf-8")), "bytes")
+```
+
+::: {.forklaring}
+1. {1} `input(...)` viser spørgsmålet og venter på, at I skriver noget og trykker Enter. Svaret gemmes som `navn`.
+2. {2} `+` sætter tre tekster sammen til én.
+3. {3} Den samme optælling af bytes som i *Bits og bytes (2)*.
+:::
+
+::: {.lille}
+`input()` virker kun på jeres egen maskine, ikke her i slides. Prøv med et navn med æ, ø eller å: kan I forklare tallet?
+:::
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+Alt er tal. Og en regel, man kan skrive ned, kan blive til et program.
+:::
+
+::: {.kol}
+**Til næste gang**
+
+Sørg for, at Python **kører** på jeres maskine. Skriv til mig, hvis det driller: det er lettere at løse nu end om fjorten dage. Læs Kernighan, kapitel 1 til 3, hvis I ikke nåede det.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion 2: Intro til Python](../02-intro-til-python/index.html). I koder selv.
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

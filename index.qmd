@@ -1,0 +1,51 @@
+---
+title: "Udvikling af IT-systemer"
+subtitle: "1-BID · Innovation og digitalisering · Aalborg Universitet · {{< var semester >}}"
+toc: false
+page-layout: full
+listing:
+  id: lektioner
+  contents: "lektioner/*/index.qmd"
+  template: _extensions/sds1/lektionsliste.ejs
+  sort: "lektion"
+  date-format: "D. MMMM"
+  fields: [lektion, title, date, description, workshop, status, slides]
+---
+
+::: {.forside-hero style="background-image: linear-gradient(90deg, #fff 35%, rgba(255,255,255,0.55) 100%), url(assets/boelger/boelge-blaa.webp);"}
+
+::: {.forside-lede}
+Hvad sker der egentlig inde i de IT-systemer, der træffer beslutninger i den offentlige sektor? På modulet lærer I, hvordan computere, algoritmer og software virker, og I lærer det ved selv at programmere i Python. Undervisningen starter med computeren og algoritmen og ender med machine learning, kunstig intelligens og chatbots.
+:::
+
+::: {.forside-fakta}
+- {{< var ects >}}
+- 10 kursusgange, hver med en workshop
+- Et fælles mini-projekt: Diversitetsbarometeret
+- Python 3 (koden i slides kører direkte i browseren)
+:::
+
+:::
+
+::: {.genveje}
+[Lektionsplan<span>datoer, litteratur, slides</span>](kursus/plan.qmd)
+
+[Om kurset<span>læringsmål, pensum, undervisere</span>](kursus/om-kurset.qmd)
+
+[Mini-projektet<span>Diversitetsbarometeret</span>](kursus/miniprojekt.qmd)
+
+[Eksamen<span>prøveform og datoer</span>](kursus/eksamen.qmd)
+
+[Værktøjer<span>Python, VS Code, terminal, Git</span>](kursus/vaerktoejer.qmd)
+
+[Moodle<span>beskeder og øvelsesfiler</span>]({{< var moodle >}})
+:::
+
+## Lektioner
+
+::: {#lektioner}
+:::
+
+## Sådan bruger I slides
+
+Kodeboksene i slides kan redigeres og køres med **Kør**. Under hver kodeboks ligger en lille fold-ud, **Forklaring af koden, trin for trin**, som forklarer koden linje for linje. Den er skrevet til jer, der aldrig har kodet før. Tryk <kbd>M</kbd> for menuen og <kbd>?</kbd> for alle genveje, eller brug knappen *Læsevisning* øverst til højre, hvis I vil læse slides som én lang side, fx på mobilen. [Mere om slides og værktøjer](kursus/vaerktoejer.qmd).

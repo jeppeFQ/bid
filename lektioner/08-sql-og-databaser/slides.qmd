@@ -1,0 +1,906 @@
+---
+title: "SQL og databaser"
+subtitle: "Lektion 08"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: orange
+pyodide:
+  packages:
+    - pandas
+---
+
+## I dag
+
+```{pyodide}
+#| autorun: true
+#| include: false
+import io
+import sqlite3
+import pandas as pd
+
+UDSNIT = {
+ "brancher": "branche_id,branche\n0,Alle\n1,Undervisning\n2,Sundhed og socialvæsen\n3,Handel\n4,Industri\n5,Bygge og anlæg\n6,Transport\n7,Offentlig administration\n8,Information og kommunikation",
+ "regioner": "region_id,region\n0,Alle\n1,Hovedstaden\n2,Sjælland\n3,Syddanmark\n4,Midtjylland\n5,Nordjylland",
+ "dimensioner": "dimension_id,dimension,navn\n1,kvinder,Kvinder\n2,seniorer,Seniorer\n3,indvandrere,Indvandrerbaggrund",
+ "grupper": "gruppe_id,branche_id,region_id,aar,antal_arbejdssteder\n1,0,0,2012,2228\n2,0,1,2012,539\n3,0,2,2012,1900\n4,0,3,2012,535\n5,0,4,2012,386\n6,0,5,2012,1383\n7,1,0,2012,319\n21,2,0,2012,306\n33,3,0,2012,1236\n47,4,0,2012,107\n59,5,0,2012,671\n70,6,0,2012,2376\n83,7,0,2012,2070\n96,8,0,2012,1609\n107,0,0,2022,913\n108,0,1,2022,1750\n109,0,2,2022,1873\n110,0,3,2022,2204\n111,0,4,2022,659\n112,0,5,2022,1806\n113,1,0,2022,2322\n127,2,0,2022,1129\n142,3,0,2022,1217\n157,4,0,2022,1394\n171,5,0,2022,347\n185,6,0,2022,1544\n198,7,0,2022,965\n211,8,0,2022,600",
+ "fordelinger": "gruppe_id,dimension_id,p25,p50,p75\n1,1,0.331,0.412,0.493\n1,2,0.082,0.163,0.244\n1,3,0.046,0.127,0.208\n2,1,0.337,0.418,0.499\n2,2,0.106,0.187,0.268\n2,3,0.076,0.157,0.237\n3,1,0.324,0.405,0.486\n3,2,0.107,0.188,0.269\n3,3,0.026,0.107,0.188\n4,1,0.336,0.416,0.497\n4,2,0.109,0.19,0.271\n4,3,0.024,0.105,0.186\n5,1,0.319,0.4,0.48\n5,2,0.104,0.185,0.266\n5,3,0.029,0.109,0.19\n6,1,0.326,0.407,0.488\n6,2,0.09,0.171,0.252\n6,3,0.0,0.064,0.145\n7,1,0.571,0.652,0.732\n7,2,0.152,0.233,0.314\n7,3,0.0,0.055,0.136\n21,1,0.691,0.772,0.853\n21,2,0.147,0.228,0.309\n21,3,0.003,0.084,0.165\n33,1,0.328,0.409,0.49\n33,2,0.004,0.084,0.165\n33,3,0.008,0.088,0.169\n47,1,0.185,0.266,0.347\n47,2,0.111,0.192,0.273\n47,3,0.008,0.089,0.17\n59,1,0.0,0.067,0.148\n59,2,0.094,0.175,0.256\n59,3,0.056,0.136,0.217\n70,1,0.156,0.237,0.318\n70,2,0.145,0.226,0.306\n70,3,0.108,0.189,0.27\n83,1,0.455,0.536,0.617\n83,2,0.177,0.258,0.339\n83,3,0.0,0.045,0.126\n96,1,0.221,0.302,0.382\n96,2,0.053,0.133,0.214\n96,3,0.043,0.124,0.205\n107,1,0.371,0.452,0.532\n107,2,0.134,0.215,0.296\n107,3,0.052,0.133,0.214\n108,1,0.327,0.408,0.489\n108,2,0.123,0.203,0.284\n108,3,0.078,0.159,0.239\n109,1,0.36,0.441,0.522\n109,2,0.146,0.227,0.308\n109,3,0.037,0.118,0.199\n110,1,0.331,0.412,0.493\n110,2,0.138,0.219,0.3\n110,3,0.041,0.122,0.203\n111,1,0.354,0.435,0.515\n111,2,0.137,0.218,0.299\n111,3,0.043,0.124,0.204\n112,1,0.341,0.422,0.503\n112,2,0.121,0.201,0.282\n112,3,0.015,0.096,0.177\n113,1,0.575,0.656,0.737\n113,2,0.169,0.25,0.331\n113,3,0.0,0.068,0.148\n127,1,0.709,0.79,0.871\n127,2,0.157,0.238,0.319\n127,3,0.04,0.12,0.201\n142,1,0.373,0.454,0.535\n142,2,0.056,0.137,0.218\n142,3,0.045,0.126,0.207\n157,1,0.214,0.295,0.376\n157,2,0.143,0.224,0.305\n157,3,0.084,0.164,0.245\n171,1,0.027,0.108,0.189\n171,2,0.115,0.196,0.277\n171,3,0.086,0.167,0.248\n185,1,0.162,0.243,0.324\n185,2,0.179,0.26,0.341\n185,3,0.086,0.167,0.248\n198,1,0.514,0.594,0.675\n198,2,0.227,0.307,0.388\n198,3,0.0,0.057,0.138\n211,1,0.228,0.309,0.39\n211,2,0.084,0.165,0.246\n211,3,0.044,0.125,0.206"
+}
+
+db = sqlite3.connect(":memory:")
+for navn, tekst in UDSNIT.items():
+    pd.read_csv(io.StringIO(tekst)).to_sql(navn, db, index=False)
+
+def sql(forespoergsel):
+    """Kør en SQL-forespørgsel på barometerets database, og giv svaret som en tabel."""
+    return pd.read_sql_query(forespoergsel, db)
+```
+
+1. **Databaser.** Hvad er det, og hvorfor bruger vi dem?
+2. **I har allerede set en.** Barometerets `data/` er *næsten* en database.
+3. **SQL.** At spørge en database.
+4. **Database-design.** Fra ting og egenskaber til tabeller og regler.
+5. **API'er.** Når to programmer taler sammen.
+6. **Workshop.**
+
+## Det, I allerede ved
+
+| Fra | Det, vi bruger i dag |
+|---|---|
+| Lektion 4 | Programmeringsparadigmer: Deklarativ programmering |
+| Lektion 5 og 6 | Referencetallene ligger i syv tabeller, der hænger sammen med id'er. I satte dem sammen med `merge` |
+| Lektion 6 | Ordbøger (kapitel 10) og filer (kapitel 13) |
+
+# Databaser
+
+Hvad er det, og hvorfor bruger vi dem?
+
+## Hvad er en database?
+
+> I har hørt ordet før. Hvad er det?
+
+[3 min]{.timer tid=180}
+
+## En definition
+
+> En database er et organiseret system til at gemme, hente og administrere data, så det er hurtigt, sikkert og pålideligt at arbejde med.
+
+:::: {.to-kol}
+::: {.kol}
+Tænk på det som et digitalt arkivskab, hvor alt er ordnet, så det let kan findes:
+
+1. **Tabeller** er skabets skuffer, én til hver slags ting
+2. **Rækker** er de enkelte sager i skuffen
+3. **Kolonner** er felterne på hver sag: titel, dato, navn
+4. **Indekser** er kartoteket, der gør det hurtigt at finde én bestemt sag
+5. **Relationer** forbinder sagerne på tværs af skufferne
+:::
+
+::: {.figur figur="tabeldele"}
+:::
+::::
+
+## Hvorfor databaser?
+
+::: {.incremental}
+
+* **Persistens**: data bliver gemt, også når programmet lukker
+
+* **Orden**: data har en fast struktur, som alle kan regne med
+
+* **Hastighed**: man kan finde det, man leder efter, uden at læse det hele
+
+* **Sikkerhed**: databasen kan nægte at gemme noget, der ikke giver mening
+
+:::
+
+# I har allerede en
+
+Barometerets `data/` er næsten en database.
+
+## Barometerets data er næsten en database
+
+Mappen `data/` er syv tabeller. De små tabeller har et id og et navn; de store peger på dem med id'er.
+
+```{mermaid}
+erDiagram
+    grupper ||--o{ fordelinger : har
+    brancher ||--o{ grupper : "branche_id"
+    regioner ||--o{ grupper : "region_id"
+    sektorer ||--o{ grupper : "sektor_id"
+    stoerrelser ||--o{ grupper : "stoerrelse_id"
+    dimensioner ||--o{ fordelinger : "dimension_id"
+```
+
+::: {.fragment}
+Og I har allerede lavet det vigtigste, en database kan: sat tabeller sammen på en fælles kolonne med `merge`. I en database hedder det et **[join]{.ord}**.
+:::
+
+## Hvad CSV-filer ikke kan
+
+Men det er stadig bare filer. Prøv at forestille jer, at fire grupper arbejder i de samme tal:
+
+::: {.incremental}
+
+1. **Ingen kontrol.** Intet forhindrer en række i `grupper` i at pege på noget, som ikke findes.
+
+2. **Ingen typer.** En CSV er tekst. Står der `"2022"` eller `2022`? Det fandt I ud af i lektion 5 (trin 10).
+
+3. **Alt skal læses.** For at finde én gruppe læser `pd.read_csv` hele filen.
+
+4. **Ingen samtidighed.** Gemmer to personer samtidig, vinder den sidste og den første forsvinder.
+
+5. **Ingen fortryd.** Går det galt halvvejs i en ændring, er filen halvt ændret.
+
+:::
+
+## Det, en database tilføjer
+
+Hvert problem fra før har en løsning:
+
+| CSV-filer | En database |
+|----|----------------|
+| Ingen kontrol | **Regler**, der håndhæves af databasen selv: en andel skal ligge mellem 0 og 1, en branche skal findes |
+| Ingen typer | **Typer**: et år er et tal, et navn er tekst |
+| Alt skal læses | **Indekser**, der gør søgning langt hurtigere: man slår op i stedet for at læse det hele |
+| Ingen samtidighed | **Samtidig adgang**: mange brugere på én gang, uden at de overskriver hinanden |
+| Ingen fortryd | **Transaktioner**: enten bliver hele ændringen gemt, eller ingen af den |
+
+::: {.fragment}
+De første to punkter kender I fra `Arbejdsplads`: klassen siger fra, når tallene ikke giver mening. En database gør det samme, bare for alle data og for alle programmer, der bruger dem.
+:::
+
+## Forskellige slags databaser
+
+| Type | Kendetegn | Eksempler |
+|---|---|---|
+| **Relationel (SQL)** | Tabeller med relationer. Fast struktur | PostgreSQL, MySQL, **SQLite** |
+| **Dokument (NoSQL)** | Dokumenter, der ligner ordbøger. Fleksibel struktur | MongoDB, CouchDB |
+
+... og mange flere.
+
+## En tredje slags: nøgle-værdi
+
+Downey kapitel 13 gemmer data med modulet `shelve`. Det er en **nøgle-værdi-database**: en ordbog, der bliver gemt på disken.
+
+```python
+import shelve
+
+lager = shelve.open("medianer")      # laver én eller flere filer, alt efter styresystem
+lager["Handel"] = 0.454
+lager.close()
+```
+
+# SQL
+
+At spørge en database: hvad, ikke hvordan.
+
+## SQL
+
+**Structured Query Language** er det sprog, man bruger til at tale med relationelle databaser.
+
+> SQL er **deklarativt**, ikke imperativt.
+
+## Imperativt og deklarativt
+
+:::: {.to-kol}
+::: {.kol}
+**Imperativt**: hvordan, trin for trin
+
+```python
+resultat = []
+for raekke in grupper:
+    if raekke["aar"] == 2022:
+        if raekke["region_id"] == 0:
+            resultat.append(raekke)
+```
+
+Og med pandas, som i lektion 6:
+
+```python
+grupper[(grupper["aar"] == 2022)
+        & (grupper["region_id"] == 0)]
+```
+:::
+
+::: {.kol}
+**Deklarativt**: hvad, ikke hvordan
+
+```sql
+SELECT *
+FROM grupper
+WHERE aar = 2022
+  AND region_id = 0;
+```
+
+Databasen finder selv den hurtigste vej til svaret. Den kender sine indekser bedre end vi gør.
+:::
+::::
+
+## Barometeret i en database
+
+Disse slides indeholder en lille SQLite-database med et udsnit af **referencetal**: hele brancher og hele regioner, uden opdeling på størrelse og sektor.
+
+Funktionen `sql()` sender en forespørgsel til databasen og giver svaret tilbage som en tabel:
+
+```python
+def sql(forespoergsel):
+    return pd.read_sql_query(forespoergsel, db)
+```
+
+::: {.fragment}
+Alt herfra kører i jeres egen browser. Prøv at ændre forespørgslerne.
+:::
+
+## `SELECT`: vælg kolonner {.kodelab}
+
+:::: {.proev forslag="Hent i stedet `region_id` og `region` fra tabellen `regioner`."}
+```{pyodide}
+print(sql("""
+SELECT branche_id, branche
+FROM brancher
+"""))
+```
+
+::: {.forklaring}
+1. {1} `sql()` sender teksten mellem de tredobbelte anførselstegn til databasen og giver svaret tilbage som en tabel.
+2. {2} `SELECT`: hvilke kolonner vil vi have?
+3. {3} `FROM`: fra hvilken tabel?
+:::
+::::
+
+::: {.lille}
+`SELECT` siger hvilke kolonner. `FROM` siger hvilken tabel. `SELECT *` betyder alle kolonner.
+:::
+
+## `WHERE`: vælg rækker {.kodelab}
+
+:::: {.proev forslag="Skift `AND` ud med `OR`. Hvor mange rækker nu?" gaet="Hvor mange rækker kommer der ud?" valg="8|9|28"}
+```{pyodide}
+print(sql("""
+SELECT gruppe_id, branche_id, aar, antal_arbejdssteder
+FROM grupper
+WHERE aar = 2022 AND region_id = 0
+"""))
+```
+
+::: {.forklaring}
+1. {2} Fire kolonner fra tabellen `grupper`.
+2. {4} `WHERE` beholder kun de rækker, hvor betingelsen er sand. `AND` virker som i Python, og ét `=` betyder *er lig med*.
+:::
+::::
+
+::: {.lille}
+Det er præcis trin 10 fra notebooken i lektion 5, bare uden firkantede parenteser og `&`.
+:::
+
+## `ORDER BY`: sortér {.kodelab}
+
+:::: {.proev}
+```{pyodide}
+print(sql("""
+SELECT gruppe_id, p50
+FROM fordelinger
+WHERE dimension_id = 1
+ORDER BY p50 DESC
+LIMIT 3
+"""))
+```
+
+::: {.forklaring}
+1. {2-3} Gruppe og median fra tabellen `fordelinger`.
+2. {4} Dimension 1 er kvinder.
+3. {5} Sortér efter medianen. `DESC` betyder største først. Uden står de mindste først.
+4. {6} `LIMIT 3` beholder kun de tre første rækker.
+:::
+::::
+
+::: {.fragment}
+Den højeste median for kvinder er gruppe 127. Hvad er gruppe 127? Og gruppe 21? Tallene giver ingen mening uden navnene ... og navnene står i en anden tabel.
+:::
+
+## Den rækkefølge, databasen arbejder i
+
+Man skriver `SELECT` først, men databasen gør det til sidst. Tryk *Næste trin*.
+
+::: {.figur figur="sql" tabel="grupper" kol="gruppe_id,branche_id,aar,antal_arbejdssteder" raekker="7,1,2012,319;21,2,2012,306;33,3,2012,1236;113,1,2022,2322;127,2,2022,1129;142,3,2022,1217;157,4,2022,1394" hvor="aar=2022" sorter="antal_arbejdssteder desc" graense="3" vaelg="gruppe_id,antal_arbejdssteder"}
+:::
+
+::: {.lille}
+Syv af rækkerne i `grupper`: hele landet, fire brancher.
+:::
+
+## `JOIN`: sæt tabeller sammen {.kodelab}
+
+:::: {.proev gaet="Hvilken branche ligger øverst?" valg="Undervisning|Sundhed og socialvæsen|Offentlig administration"}
+```{pyodide}
+print(sql("""
+SELECT brancher.branche, fordelinger.p50
+FROM fordelinger
+JOIN grupper  ON fordelinger.gruppe_id = grupper.gruppe_id
+JOIN brancher ON grupper.branche_id   = brancher.branche_id
+WHERE fordelinger.dimension_id = 1
+  AND grupper.aar = 2022
+  AND grupper.region_id = 0
+  AND brancher.branche != 'Alle'
+ORDER BY fordelinger.p50 DESC
+"""))
+```
+
+::: {.forklaring}
+1. {2} `tabel.kolonne`: når flere tabeller er med, siger man, hvilken tabel kolonnen kommer fra.
+2. {3-4} Start i `fordelinger`, og hent den gruppe, hver række peger på.
+3. {5} Hent derefter den branche, gruppen peger på.
+4. {6-9} Kvinder, 2022, hele landet, og ikke rækken *Alle*. `!=` betyder *er ikke lig med*.
+5. {10} Højeste median først.
+:::
+::::
+
+::: {.lille}
+Sammenlign med lektion 5: `fordelinger.merge(grupper, on="gruppe_id").merge(brancher, on="branche_id")`. Samme operation, to sprog.
+:::
+
+## `GROUP BY`: regn på grupper {.kodelab}
+
+:::: {.proev}
+```{pyodide}
+print(sql("""
+SELECT dimensioner.navn,
+       grupper.aar,
+       ROUND(AVG(fordelinger.p50), 3) AS gennemsnit
+FROM fordelinger
+JOIN grupper     ON fordelinger.gruppe_id    = grupper.gruppe_id
+JOIN dimensioner ON fordelinger.dimension_id = dimensioner.dimension_id
+WHERE grupper.branche_id != 0 AND grupper.region_id = 0
+GROUP BY dimensioner.navn, grupper.aar
+ORDER BY dimensioner.navn, grupper.aar
+"""))
+```
+
+::: {.forklaring}
+1. {2-3} Dimensionens navn og året.
+2. {4} Gennemsnittet af medianerne, rundet af til tre decimaler. `AS` giver den nye kolonne et navn.
+3. {6-7} Hent året fra `grupper` og navnet fra `dimensioner`.
+4. {8} De otte brancher (ikke *Alle*), hele landet.
+5. {9} Én række pr. kombination af dimension og år. `AVG` regnes inden for hver af dem.
+6. {10} Sortér efter navn og år.
+:::
+::::
+
+::: {.fragment}
+Gennemsnittet af de otte branchers median, pr. dimension og år. Alle tre er steget fra 2012 til 2022 (i de syntetiske tal).
+:::
+
+## SQL's fem typer kommandoer
+
+| Type | Hvad den gør | Kommandoer |
+|---|---|---|
+| **Definition** | Laver strukturen: tabeller, kolonner, regler | `CREATE`, `ALTER`, `DROP` |
+| **Ændring** | Tilføjer, retter og sletter data | `INSERT`, `UPDATE`, `DELETE` |
+| **Forespørgsel** | Henter data | `SELECT` |
+| **Adgang** | Bestemmer, hvem der må hvad | `GRANT`, `REVOKE` |
+| **Transaktioner** | Gemmer alt eller intet | `COMMIT`, `ROLLBACK` |
+
+::: {.fragment}
+I har lige brugt den tredje. I dag ser vi kun de første tre.
+:::
+
+## Fra Python til en databasefil
+
+I appen ville man gemme databasen i en fil i stedet for i hukommelsen:
+
+```python
+import sqlite3
+import pandas as pd
+
+db = sqlite3.connect("data/barometer.db")
+
+for navn in ["brancher", "regioner", "sektorer", "stoerrelser",
+             "dimensioner", "grupper", "fordelinger"]:
+    pd.read_csv(f"data/{navn}.csv").to_sql(navn, db, index=False, if_exists="replace")
+```
+
+## Brugerens tekst: brug `?`
+
+**Cybersikkerhed:** når brugeren skal bestemme noget i forespørgslen, så brug `?`, aldrig en f-streng:
+
+```python
+branche = "Handel"                 # det, brugeren valgte
+pd.read_sql_query("SELECT * FROM brancher WHERE branche = ?", db, params=(branche,))
+```
+
+::: {.fragment}
+Med `?` behandler databasen brugerens tekst som en **værdi** og aldrig som en del af kommandoen. Ellers kan en ondsindet bruger skrive SQL ind i feltet. Det hedder *SQL injection*.
+:::
+
+# Database-design
+
+Fra ting og egenskaber til tabeller og regler.
+
+## Fire trin
+
+::: {.incremental}
+
+1. **Find tingene**: hvilke slags ting skal databasen holde styr på? Det kaldes *entiteter*
+
+2. **Find egenskaberne**: hvad skal vi vide om hver ting? Det er *attributterne*
+
+3. **Find forbindelserne**: hvordan hænger tingene sammen? Det er *relationerne*
+
+4. **Skriv skemaet**: oversæt det hele til `CREATE TABLE`
+
+:::
+
+::: {.fragment}
+Det er det samme som abstraktionen i lektion 4 og klassekortene i lektion 5: hvad *er* en ting, og hvad *ved* den?
+:::
+
+## Trin 1–3 for barometeret
+
+:::: {.to-kol}
+::: {.kol}
+**Tingene og deres egenskaber**
+
+- **Branche**: navn
+- **Region**: navn
+- **Dimension**: navn (kvinder, seniorer, indvandrerbaggrund)
+- **Gruppe**: en branche, en region, en størrelse, en sektor, et år, og hvor mange arbejdssteder den dækker
+- **Fordeling**: en gruppe, en dimension, og fem percentiler
+:::
+
+::: {.kol}
+**Forbindelserne**
+
+- **En-til-mange:** én branche har mange grupper. Én gruppe har tre fordelinger, én pr. dimension
+
+- **Mange-til-mange:** findes ikke her. Men hvis én arbejdsplads kunne høre til flere brancher, ville man skulle bruge en ekstra tabel imellem
+
+:::
+::::
+
+## Trin 4: skemaet {.kodelab}
+
+:::: {.proev}
+```{pyodide}
+ny = sqlite3.connect(":memory:")
+ny.execute("PRAGMA foreign_keys = ON")
+
+ny.executescript("""
+CREATE TABLE brancher (
+    branche_id  INTEGER PRIMARY KEY,
+    branche     TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE grupper (
+    gruppe_id   INTEGER PRIMARY KEY,
+    branche_id  INTEGER NOT NULL REFERENCES brancher(branche_id),
+    aar         INTEGER NOT NULL CHECK (aar IN (2012, 2022))
+);
+
+CREATE TABLE fordelinger (
+    gruppe_id     INTEGER NOT NULL REFERENCES grupper(gruppe_id),
+    dimension_id  INTEGER NOT NULL,
+    p50           REAL NOT NULL CHECK (p50 BETWEEN 0 AND 1),
+    PRIMARY KEY (gruppe_id, dimension_id)
+);
+""")
+
+ny.execute("INSERT INTO brancher VALUES (3, 'Handel')")
+ny.execute("INSERT INTO grupper VALUES (1, 3, 2022)")
+ny.execute("INSERT INTO fordelinger VALUES (1, 1, 0.454)")
+
+print(pd.read_sql_query("SELECT * FROM fordelinger", ny))
+```
+
+::: {.forklaring}
+1. {1} En ny, tom database i hukommelsen.
+2. {2} Slå kontrollen af fremmednøgler (*foreign keys*) til. SQLite har historisk haft den slået fra som standard.
+3. {5-8} Tabellen `brancher`. `NOT NULL`: feltet må ikke være tomt. `UNIQUE`: samme navn må kun stå én gang.
+4. {12} En fremmednøgle: værdien i `grupper.branche_id` skal findes i `brancher.branche_id`. Vi kan altså ikke indsætte en gruppe, der henviser til en branche, som ikke findes.
+5. {13} En regel: året skal være 2012 eller 2022.
+6. {19} En regel: medianen skal ligge mellem 0 og 1.
+7. {20} Nøglen er to kolonner sammen: én række pr. gruppe og dimension.
+8. {24-26} Tre gyldige rækker, én i hver tabel.
+9. {28} Vis indholdet af `fordelinger`.
+:::
+::::
+
+::: {.lille}
+`PRIMARY KEY`: rækkens unikke id. `REFERENCES`: en **[fremmednøgle]{.ord}**, der skal pege på en række, der findes. `CHECK`: en regel, databasen håndhæver. `UNIQUE`: samme værdi må kun stå én gang.
+:::
+
+## Databasen siger fra {.kodelab}
+
+:::: {.proev gaet="Hvor mange af de fire bliver gemt?" valg="0|2|4"}
+```{pyodide}
+forsoeg = [
+    ("en andel over 1",             "INSERT INTO fordelinger VALUES (1, 2, 1.4)"),
+    ("en branche, der ikke findes", "INSERT INTO grupper VALUES (2, 99, 2022)"),
+    ("et år, vi ikke har tal for",  "INSERT INTO grupper VALUES (3, 3, 2017)"),
+    ("Handel én gang til",          "INSERT INTO brancher VALUES (4, 'Handel')"),
+]
+
+for hvad, kommando in forsoeg:
+    try:
+        ny.execute(kommando)
+        print(f"{hvad:<28} → gemt")
+    except sqlite3.IntegrityError as fejl:
+        print(f"{hvad:<28} → afvist: {fejl}")
+```
+
+::: {.forklaring}
+1. {1-6} Fire forsøg på at gemme noget ugyldigt. Hvert forsøg er et par: en beskrivelse og en SQL-kommando.
+2. {2} En median på 1,4 bryder `CHECK`.
+3. {3} Branche 99 findes ikke: fremmednøglen siger fra.
+4. {4} 2017 bryder `CHECK` på året.
+5. {5} Handel findes allerede: `UNIQUE` siger fra.
+6. {9-13} `try` og `except`: prøv kommandoen, og fang fejlen, hvis databasen siger nej.
+7. {11} `:<28` fylder beskrivelsen ud til 28 tegn, så pilene står på linje.
+:::
+::::
+
+::: {.lille}
+Fire ugyldige rækker, fire afvisninger. Det er `UgyldigArbejdsplads` fra lektion 5 igen, bare i databasen i stedet for i klassen. **Reglerne bor ét sted, og ingen kan komme uden om dem.**
+:::
+
+## SQLite-fælden {.kodelab}
+
+:::: {.proev gaet="Bliver rækken gemt?" valg="Ja|Nej"}
+```{pyodide}
+uden = sqlite3.connect(":memory:")      # her er PRAGMA foreign_keys IKKE slået til
+
+uden.executescript("""
+CREATE TABLE brancher (branche_id INTEGER PRIMARY KEY, branche TEXT NOT NULL);
+CREATE TABLE grupper  (gruppe_id INTEGER PRIMARY KEY,
+                       branche_id INTEGER NOT NULL REFERENCES brancher(branche_id));
+""")
+
+uden.execute("INSERT INTO grupper VALUES (1, 99)")
+print(pd.read_sql_query("SELECT * FROM grupper", uden))
+print("Gemt — selvom branche 99 ikke findes.")
+```
+
+::: {.forklaring}
+1. {1} En ny database, men denne gang **uden** `PRAGMA foreign_keys = ON`.
+2. {3-7} Den samme fremmednøgle som før.
+3. {9} Branche 99 findes ikke. Tabellen `brancher` er endda tom.
+4. {10-11} Rækken er gemt alligevel.
+:::
+::::
+
+::: {.lille}
+I SQLite er fremmednøgler **slået fra**, medmindre man skriver `PRAGMA foreign_keys = ON` hver gang, man åbner databasen. Det er en af de ting, der er værd at vide, før man har brug for det.
+:::
+
+# API'er
+
+Når to programmer taler sammen.
+
+## API
+
+**Application Programming Interface** er en *kontrakt*, der bestemmer, hvordan to programmer taler sammen.
+
+:::: {.to-kol}
+::: {.kol}
+- **Gæsten** (klienten) ved ikke, hvordan køkkenet virker
+- **Menuen** (dokumentationen) viser, hvad man kan bestille
+- **Tjeneren** ([API]{.ord}'et) tager imod bestillingen og kommer tilbage med maden
+- **Køkkenet** (databasen) laver maden, uden at gæsten ser det
+:::
+
+::: {.figur figur="lag" start="Gæsten bestiller efter menuen." slut="Maden kommer tilbage samme vej." lag="Gæsten|klienten;Tjeneren|API'et;Køkkenet|databasen"}
+:::
+::::
+
+::: {.fragment}
+Det er **grænsefladen** fra lektion 4, bare mellem to programmer i stedet for mellem to funktioner. Køkkenet kan bygges om, uden at menuen ændrer sig.
+:::
+
+## REST
+
+Den mest udbredte måde at bygge API'er til nettet på. Den bygger på HTTP, som er det samme, jeres browser bruger.
+
+::: {.incremental}
+
+1. **Alt er ressourcer** med en adresse: `/api/brancher`, `/api/brancher/Handel`
+
+2. **HTTP-metoder** siger, hvad man vil gøre med dem
+
+3. **Hver forespørgsel står alene.** Serveren husker ikke, hvad du spurgte om sidst
+
+4. **Svaret er typisk [JSON]{.ord}** og JSON ligner en Python-ordbog fra kapitel 10
+
+:::
+
+## HTTP-metoderne
+
+| Metode | Formål | I SQL |
+|---|---|---|
+| `GET` | Hent | `SELECT` |
+| `POST` | Opret | `INSERT` |
+| `PUT` | Erstat det hele | `UPDATE` |
+| `PATCH` | Ret dele | `UPDATE` |
+| `DELETE` | Slet | `DELETE` |
+
+## Et API til barometerets referencetal
+
+```
+GET  /api/brancher                    alle brancher
+GET  /api/brancher/Handel             medianerne for Handel i 2022
+GET  /api/regioner                    alle regioner
+GET  /api/regioner/Nordjylland        medianerne for Nordjylland
+GET  /api/grupper?branche=Handel&aar=2012
+                                      grupperne for Handel i 2012
+```
+
+## Svaret er JSON
+
+:::: {.to-kol .smal-bred}
+::: {.kol}
+**Forespørgslen og svarets hoved**
+
+```
+GET /api/brancher/Handel
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+:::
+
+::: {.kol}
+**Svarets indhold**
+
+```
+{
+  "branche": "Handel",
+  "aar": 2022,
+  "medianer": {
+    "kvinder": 0.454,
+    "seniorer": 0.137,
+    "indvandrere": 0.126
+  }
+}
+```
+:::
+::::
+
+::: {.lille}
+Krøllede parenteser, nøgler og værdier: det er en ordbog i Python. JSON er den måde, ordbøger "rejser" over nettet på.
+:::
+
+## Statuskoder
+
+| Kode | Betydning |
+|---|---|
+| **200** | OK |
+| **201** | Oprettet |
+| **400** | Ugyldig forespørgsel |
+| **404** | Findes ikke |
+| **405** | Metoden er ikke tilladt |
+| **500** | Fejl på serveren |
+
+## Et lille API i Python {.kodelab}
+
+:::: {.proev gaet="Hvilken statuskode får DELETE?" valg="200|404|405"}
+```{pyodide}
+import json
+
+def api(metode, sti):
+    """Et lille API. Klienten sender en metode og en adresse; API'et spørger databasen."""
+    if metode != "GET":
+        return 405, {"fejl": "Barometeret kan kun læses"}
+
+    dele = sti.strip("/").split("/")        # "/api/brancher/Handel" → ["api", "brancher", "Handel"]
+
+    if dele == ["api", "brancher"]:
+        svar = sql("SELECT branche FROM brancher WHERE branche != 'Alle'")
+        return 200, {"brancher": list(svar["branche"])}
+
+    if len(dele) == 3 and dele[:2] == ["api", "brancher"]:
+        svar = pd.read_sql_query("""
+            SELECT dimensioner.dimension, fordelinger.p50
+            FROM fordelinger
+            JOIN grupper     ON fordelinger.gruppe_id    = grupper.gruppe_id
+            JOIN brancher    ON grupper.branche_id       = brancher.branche_id
+            JOIN dimensioner ON fordelinger.dimension_id = dimensioner.dimension_id
+            WHERE brancher.branche = ? AND grupper.aar = 2022 AND grupper.region_id = 0
+        """, db, params=(dele[2],))
+        if len(svar) == 0:
+            return 404, {"fejl": f"Branchen findes ikke: {dele[2]}"}
+        return 200, {"branche": dele[2], "aar": 2022,
+                     "medianer": dict(zip(svar["dimension"], svar["p50"]))}
+
+    return 404, {"fejl": "Ukendt adresse"}
+
+for metode, sti in [("GET", "/api/brancher"),
+                    ("GET", "/api/brancher/Handel"),
+                    ("GET", "/api/brancher/Fiskeri"),
+                    ("DELETE", "/api/brancher/Handel")]:
+    status, svar = api(metode, sti)
+    print(metode, sti, "→", status)
+    print("   ", json.dumps(svar, ensure_ascii=False))
+```
+
+::: {.forklaring}
+1. {3-4} API'et er én funktion: den får en metode og en adresse og giver en statuskode og et svar tilbage.
+2. {5-6} Kun `GET` er tilladt. Alt andet giver 405: metoden er ikke tilladt.
+3. {8} Del adressen op ved skråstregerne.
+4. {10-12} `/api/brancher`: hent alle brancher, og giv dem tilbage som en liste.
+5. {14-22} `/api/brancher/<navn>`: medianerne for én branche. Navnet sendes med `?`, aldrig med en f-streng.
+6. {23-24} Ingen rækker? Så findes branchen ikke: 404.
+7. {25-26} Ellers 200 og en ordbog. `dict(zip(...))` parrer hver dimension med sin median.
+8. {28} Alle andre adresser: 404.
+9. {30-36} Fire forespørgsler fra en klient. `json.dumps` laver ordbogen om til JSON-tekst.
+:::
+::::
+
+::: {.lille}
+Hele kæden i én celle: klienten sender en metode og en adresse, API'et oversætter til SQL, databasen svarer, og API'et pakker svaret som JSON med en statuskode.
+:::
+
+## Det hele system
+
+Tryk *Næste trin*, og følg en forespørgsel ned gennem systemet og tilbage.
+
+::: {.figur figur="lag" start="Klienten sender en HTTP-forespørgsel." slut="Databasen svarer, API'et pakker svaret som JSON, og klienten får det." lag="Klient|browser, app eller et andet program;API|tjekker forespørgslen, spørger databasen med SQL og laver svaret;Database|gemmer data, håndhæver regler, gemmer alt eller intet"}
+:::
+
+::: {.fragment}
+Lagene fra lektion 4 igen. Hvert lag kender kun grænsefladen til laget nedenunder.
+:::
+
+# Workshop
+
+SQL i browseren, og så barometeret.
+
+## Øvelse 1: SQL i browseren {.scrollable}
+
+[20 min]{.timer tid=1200}
+
+Åbn [sqlitetutorial.net's øvelsesside](https://www.sqlitetutorial.net/tryit/query/sqlite-select/#invoices). Tabellen `invoices` er fakturaer fra en musikbutik.
+
+1. Vis alle kolonner og rækker fra `invoices`.
+
+2. Vis kun `BillingCountry`, `CustomerId` og `Total`.
+
+3. Hvad er den samlede omsætning pr. land?
+
+4. Hvor mange fakturaer blev udstedt i 2010?
+
+5. Hvilken kunde har brugt flest penge i alt?
+
+6. Hvilke lande har et gennemsnitligt fakturabeløb over 10?
+
+<details>
+<summary>Løsningsforslag</summary>
+
+```sql
+-- 1
+SELECT * FROM invoices;
+
+-- 2
+SELECT BillingCountry, CustomerId, Total FROM invoices;
+
+-- 3
+SELECT BillingCountry, SUM(Total) AS SamletOmsaetning
+FROM invoices
+GROUP BY BillingCountry
+ORDER BY SamletOmsaetning DESC;
+
+-- 4
+SELECT COUNT(*) AS Antal2010
+FROM invoices
+WHERE strftime('%Y', InvoiceDate) = '2010';
+
+-- 5
+SELECT CustomerId, SUM(Total) AS SamletForbrug
+FROM invoices
+GROUP BY CustomerId
+ORDER BY SamletForbrug DESC
+LIMIT 1;
+
+-- 6
+SELECT BillingCountry, AVG(Total) AS Gennemsnit
+FROM invoices
+GROUP BY BillingCountry
+HAVING AVG(Total) > 10
+ORDER BY Gennemsnit DESC;
+```
+
+`HAVING` er `WHERE` for grupper: `WHERE` vælger rækker, før de bliver grupperet; `HAVING` vælger grupper, efter de er regnet ud.
+
+</details>
+
+## Øvelse 2: Barometeret i SQL {.opgave}
+
+::: {.opgavetekst .lille}
+Skriv jeres egne forespørgsler i editoren.
+
+1. Hvilke tre brancher havde den højeste median for seniorer i 2022?
+2. Hvilken region har den laveste median for indvandrerbaggrund i 2022? *Tip: regionerne står i grupper med `branche_id = 0`.*
+3. Hvor meget steg medianen for kvinder i Handel fra 2012 til 2022?
+4. Hvor mange arbejdssteder er der i alt i de otte brancher, pr. år? Passer det med rapportens 7.225?
+
+[20 min]{.timer tid=1200}
+:::
+
+:::: {.proev}
+```{pyodide}
+print(sql("""
+SELECT *
+FROM brancher
+"""))
+```
+::::
+
+## Øvelse 2: løsningsforslag {.scrollable}
+
+<details>
+<summary>Løsningsforslag</summary>
+
+```sql
+-- 1 Offentlig administration (0,307), Transport (0,260), Undervisning (0,250)
+SELECT brancher.branche, fordelinger.p50
+FROM fordelinger
+JOIN grupper  ON fordelinger.gruppe_id = grupper.gruppe_id
+JOIN brancher ON grupper.branche_id   = brancher.branche_id
+WHERE fordelinger.dimension_id = 2 AND grupper.aar = 2022
+  AND grupper.region_id = 0 AND brancher.branche != 'Alle'
+ORDER BY fordelinger.p50 DESC
+LIMIT 3;
+
+-- 2 Nordjylland (0,096)
+SELECT regioner.region, fordelinger.p50
+FROM fordelinger
+JOIN grupper  ON fordelinger.gruppe_id = grupper.gruppe_id
+JOIN regioner ON grupper.region_id    = regioner.region_id
+WHERE fordelinger.dimension_id = 3 AND grupper.aar = 2022
+  AND grupper.branche_id = 0 AND regioner.region != 'Alle'
+ORDER BY fordelinger.p50
+LIMIT 1;
+
+-- 3 fra 0,409 til 0,454: 4,5 procentpoint
+SELECT grupper.aar, fordelinger.p50
+FROM fordelinger
+JOIN grupper  ON fordelinger.gruppe_id = grupper.gruppe_id
+JOIN brancher ON grupper.branche_id   = brancher.branche_id
+WHERE brancher.branche = 'Handel' AND fordelinger.dimension_id = 1
+  AND grupper.region_id = 0
+ORDER BY grupper.aar;
+
+-- 4 8.694 i 2012 og 9.518 i 2022
+SELECT aar, SUM(antal_arbejdssteder) AS i_alt
+FROM grupper
+WHERE branche_id != 0 AND region_id = 0
+GROUP BY aar;
+```
+
+Nr. 4 passer ikke med rapportens 7.225 — og det skal den heller ikke. Tallene er syntetiske, og antallet af arbejdssteder i hver gruppe er trukket tilfældigt. Det er en god påmindelse om at tjekke, om tallene hænger sammen, før man stoler på dem.
+
+</details>
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+En database er tabeller med regler, som databasen selv håndhæver. SQL siger *hvad* man vil have, ikke *hvordan*.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Gør øvelse 2 færdig, hvis I ikke nåede den. Løsningsforslagene ligger efter øvelserne.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion 9: Plain text, compilere og markup](../09-plain-text-compilere-og-markup/index.html). Læs Kernighan (2021), kap. 5 og 10, og Healy, *The Plain Person's Guide to Plain Text Social Science*.
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

@@ -1,0 +1,41 @@
+---
+title: "Git og versionskontrol"
+lektion: 3
+date: 2026-09-22
+description: "Hvad versionskontrol løser, og hvordan Git holder styr på ændringer over tid. Repository, commit, fork og pull request."
+workshop: "Git i praksis og Python-øvelser"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Pro Git, kap. 1 og 2"
+  - "*Getting Started with GitHub*"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 08.15–12.00 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Når man skriver kode, ændrer man i den hele tiden, og før eller siden har man brug for at gå tilbage til en udgave, der virkede, eller at arbejde i den samme kode som andre uden at overskrive hinandens arbejde. Det er det, versionskontrol løser. Vi ser på, hvad Git er, hvordan det holder styr på ændringer over tid, og hvordan man deler kode med andre via GitHub. Vi starter med en kort genopfriskning af filsystemet fra første lektion, for det er dét, Git holder øje med.
+
+## Workshop
+
+Vi opsætter Git og GitHub på jeres computere. I laver jeres første pull request ved at skrive under i en fælles gæstebog på GitHub, og I opretter jeres eget repository, som I skal arbejde i resten af semestret. Derefter fortsætter I med Python-øvelserne, nu med versionskontrol undervejs.
+
+## Forberedelse og litteratur
+
+- [Pro Git](https://git-scm.com/book/en/v2), kapitel 1 og 2.
+- [Getting Started with GitHub](https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account).
+- Opret gerne en GitHub-konto inden lektionen: [github.com/signup](https://github.com/signup).
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

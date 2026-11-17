@@ -1,0 +1,72 @@
+# =====================================================================
+#  1-BID · Udvikling af IT · kursushjemmeside
+#  Byg lokalt:   quarto preview      (eller: quarto render)
+#  Udgives automatisk til GitHub Pages af .github/workflows/publish.yml
+# =====================================================================
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "!_skabeloner/"
+    - "!README.md"
+  resources:
+    - assets/
+
+engine: markdown          # intet køres ved render; koden køres i browseren
+lang: da
+
+website:
+  title: "1-BID · Udvikling af IT"
+  description: "Kursushjemmeside for modulet Udvikling af IT (1-BID) ved Aalborg Universitet: slides, litteratur, mini-projekt og eksamen."
+  site-url: https://jeppefq.github.io/bid/
+  repo-url: https://github.com/jeppeFQ/bid
+  repo-actions: [source, issue]
+  favicon: assets/logo/favicon.png
+  search:
+    location: navbar
+    type: overlay
+  page-navigation: false
+  back-to-top-navigation: true
+  open-graph: true
+  navbar:
+    title: "Udvikling af IT"
+    logo: assets/logo/aau-logo.png
+    logo-alt: "Aalborg Universitet"
+    left:
+      - text: Lektioner
+        href: kursus/plan.qmd
+      - text: Om kurset
+        href: kursus/om-kurset.qmd
+      - text: Mini-projekt
+        href: kursus/miniprojekt.qmd
+      - text: Eksamen
+        href: kursus/eksamen.qmd
+      - text: Værktøjer
+        href: kursus/vaerktoejer.qmd
+    right:
+      - icon: github
+        href: https://github.com/jeppeFQ/bid
+        aria-label: "Kursets GitHub-repository"
+  page-footer:
+    left: |
+      Aalborg Universitet · 1-BID · {{< var semester >}}
+    right: |
+      Indhold: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.da) · kode: MIT · bygget med [Quarto](https://quarto.org)
+
+format:
+  html:
+    html-math-method: mathml       # ingen MathJax fra et CDN
+    theme: [_extensions/sds1/site.scss]
+    toc: true
+    toc-title: "På siden"
+    toc-depth: 2
+    code-copy: true
+    link-external-newwindow: true
+    smooth-scroll: true
+    date-format: "D. MMMM YYYY"
+    published-title: "Dato"
+
+filters:
+  - _extensions/sds1/forklaring.lua
+  - _extensions/sds1/sds1.lua              # selv-hostede skrifter på alle sider

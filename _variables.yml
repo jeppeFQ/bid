@@ -1,0 +1,9 @@
+# Ændres én gang om året. Bruges i tekst som {{< var semester >}}.
+semester: "Efterår 2026"
+kursus: "Udvikling af IT (1-BID)"
+ects: "10 ECTS"
+underviser: "Jeppe Fjeldgaard Qvist"
+moodle: "https://www.moodle.aau.dk/course/view.php?id=59710"
+think-python: "https://allendowney.github.io/ThinkPython/index.html"
+projekt: "https://github.com/jeppeFQ/BID-workshop-projekt"
+eksamen: "mandag den 16. november 2026 kl. 8.00 til tirsdag den 17. november 2026 kl. 16.00"

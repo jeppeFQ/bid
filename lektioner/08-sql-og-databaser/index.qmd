@@ -1,0 +1,42 @@
+---
+title: "SQL og databaser"
+lektion: 8
+date: 2026-10-20
+description: "Hvorfor databaser, og hvad en database kan, som en CSV-fil ikke kan. SQL, database-design og API'er."
+workshop: "Python/SQL-øvelser"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Downey (2024), kap. 13"
+  - "*What is SQLite?*"
+  - "IBM om REST API"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 12.30–16.15 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Barometerets data er næsten en database. Vi ser på, hvad en database tilføjer, lærer de vigtigste SQL-kommandoer, designer et skema og ser, hvordan data deles mellem systemer gennem et API.
+
+## Workshop
+
+Python/SQL-øvelser: SQL i browseren og barometeret i SQL.
+
+## Forberedelse og litteratur
+
+- Downey (2024): *Think Python*, kapitel 13.
+- Læs *What is SQLite?*. Vi arbejder med øvelserne til lektionen.
+- Læs IBM's side, og se videoen om REST API.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

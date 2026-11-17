@@ -1,0 +1,4 @@
+# Gælder alle slides og lektionssider i denne mappe.
+kursus: "1-BID · Udvikling af IT"       # vises på titelslidet
+mermaid:
+  theme: neutral

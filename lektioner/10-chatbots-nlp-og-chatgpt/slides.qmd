@@ -1,0 +1,833 @@
+---
+title: "Chatbots, NLP og ChatGPT"
+subtitle: "Lektion 10"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: gul
+---
+
+## I dag
+
+1. **Fra tal til ord.** Et ord bliver til en vektor.
+2. **"Næste ord".** Den simpleste sprogmodel.
+3. **Transformeren.** Hvordan en model ved, hvad "det" henviser til.
+4. **Fra GPT-2 til ChatGPT.**
+5. **Hvad sker der indeni?** Og hvorfor det er så svært at svare på.
+6. **Bias i ordvektorer.**
+7. **Workshop.**
+8. **Afslutning.**
+
+## Det, I allerede ved
+
+| Fra | Det, vi bruger i dag |
+|---|---|
+| Lektion 1 | Alt er tal. Hvert tal fylder et antal byte |
+| Lektion 6 | Ordbøger og tekstanalyse |
+| Lektion 7 | Naive Bayes: tæl ord, og regn sandsynligheder. Supervised læring. Tabsfunktionen |
+| Lektion 5 og 8 | Modeller udelader noget. |
+
+En sprogmodel er ikke magi. Det er de samme idéer, bare med milliarder af tal i stedet for de ti anmeldelser fra lektion 7.
+
+# Fra tal til ord
+
+Et ord bliver til en vektor.
+
+## Hvordan bliver et ord til tal? {.kodelab}
+
+Computeren kan kun regne med tal. Så hvordan repræsenterer vi *hund*, *kat* og *konge*?
+
+**Første forsøg: one-hot.** Hvert ord får sin egen plads i en lang liste af nuller.
+
+:::: {.proev gaet="Hvilket par ligger tættest på hinanden?" valg="kat – hund|kat – æble|De er lige langt fra hinanden"}
+```{pyodide}
+import math
+
+kat      = [1, 0, 0, 0, 0]
+hund     = [0, 1, 0, 0, 0]
+konge    = [0, 0, 1, 0, 0]
+dronning = [0, 0, 0, 1, 0]
+aeble    = [0, 0, 0, 0, 1]
+
+print("kat – hund:       ", round(math.dist(kat, hund), 3))
+print("kat – æble:       ", round(math.dist(kat, aeble), 3))
+print("konge – dronning: ", round(math.dist(konge, dronning), 3))
+```
+
+::: {.forklaring}
+1. {1} `math` har funktionen `dist`, der måler den lige afstand mellem to punkter.
+2. {3-7} Fem ord, fem pladser. Hvert ord har et 1 på sin egen plads og 0 alle andre steder.
+3. {9-11} Afstanden mellem tre par af ord, rundet af til tre decimaler.
+:::
+::::
+
+## Hvad er problemet?
+
+::: {.incremental}
+
+* **Alle ord er lige langt fra hinanden.** *Kat* er lige så langt fra *hund* som fra *æble*. Modellen kan ikke se, at to ord ligner hinanden.
+
+* **Den lærer intet på tværs.** Det, den lærer om *kat*, hjælper den ikke med *hund*.
+
+* **Den er enorm.** GPT-2 og GPT-3 har et ordforråd på godt 50.000 tokens. Så er hvert ord en liste med 50.000 tal, hvoraf ét er 1 og resten er 0.
+
+:::
+
+::: {.fragment}
+Vi *ved*, at *kat* og *hund* hører sammen, og at *kat* og *æble* ikke gør. Det skal tallene kunne vise.
+:::
+
+## Andet forsøg: små vektorer {.kodelab}
+
+Hvert ord får tal langs nogle dimensioner, der ikke er nul. Her to, så vi kan tegne dem. I rigtige modeller er det hundredvis.
+
+:::: {.proev gaet="Hvilket par ligger tættest?" valg="film – se|film – serie|spise – pizza"}
+```{pyodide}
+import math
+
+ord = {
+    "film":  [0.9, 0.8],
+    "serie": [0.8, 0.9],
+    "se":    [0.9, 0.7],
+    "pizza": [0.2, 0.1],
+    "spise": [0.1, 0.2],
+}
+
+for a, b in [("film", "se"), ("film", "serie"), ("se", "pizza"), ("spise", "pizza")]:
+    print(f"{a:>5} – {b:<6} {math.dist(ord[a], ord[b]):.2f}")
+```
+
+::: {.forklaring}
+1. {3-9} Hvert ord har to tal: et punkt i et plan.
+2. {11} Fire par af ord.
+3. {12} Afstanden med to decimaler. `:>5` og `:<6` sætter ordene på linje.
+:::
+::::
+
+::: {.lille}
+`math.dist` måler den lige afstand mellem to punkter. Små afstande betyder, at ordene ligner hinanden.
+:::
+
+## Ord som punkter
+
+De samme fem ord, tegnet. Klik på et ord for at måle afstanden til et andet.
+
+::: {.figur figur="vektorer" ord="film:0.9:0.8;serie:0.8:0.9;se:0.9:0.7;pizza:0.2:0.1;spise:0.1:0.2" par="film,se"}
+:::
+
+## Konge − mand + kvinde
+
+Tryk *Næste trin*, og følg pilene. Tallene er de samme som i koden på næste slide.
+
+::: {.figur figur="analogi" ord="mand:0:0;kvinde:0:1;konge:1:0;dronning:1:1;prins:0.7:0.1;æble:0.1:0.4" regn="konge,mand,kvinde"}
+:::
+
+## Geometri er betydning {.kodelab}
+
+Det berømte eksempel: **konge − mand + kvinde ≈ dronning**
+
+:::: {.proev}
+```{pyodide}
+import math
+
+vektorer = {
+    "mand":     [0.0, 0.0],
+    "kvinde":   [0.0, 1.0],
+    "konge":    [1.0, 0.0],
+    "dronning": [1.0, 1.0],
+    "prins":    [0.7, 0.1],
+    "æble":     [0.1, 0.4],
+}
+
+def regn(a, minus, plus):
+    return [x - y + z for x, y, z in zip(vektorer[a], vektorer[minus], vektorer[plus])]
+
+def naermeste(vektor, undtagen):
+    kandidater = [o for o in vektorer if o not in undtagen]
+    return min(kandidater, key=lambda o: math.dist(vektorer[o], vektor))
+
+resultat = regn("konge", "mand", "kvinde")
+print("konge - mand + kvinde =", resultat)
+print("nærmeste ord:", naermeste(resultat, undtagen=["konge", "mand", "kvinde"]))
+```
+
+::: {.forklaring}
+1. {3-10} Seks ord med to tal hver.
+2. {12-13} `regn` trækker ét ord fra og lægger et andet til, tal for tal. `zip` parrer de tre lister.
+3. {15-17} `naermeste` finder det ord, der ligger tættest på et punkt, blandt de ord, der ikke er udelukket. `key=` fortæller `min`, hvad den skal sammenligne på.
+4. {19} Regn *konge − mand + kvinde* ud.
+5. {20-21} Vis resultatet og det nærmeste ord.
+:::
+::::
+
+::: {.lille}
+Læg mærke til `undtagen`. Uden den er det ofte *konge* selv, der ligger nærmest. Det berømte eksempel virker kun så pænt, fordi man udelukker de ord, man regnede med.
+:::
+
+## Prøv selv: en analogi
+
+> paris − frankrig + italien ≈ ?
+
+[2 min]{.timer tid=120}
+
+## Hvor mange tal pr. ord?
+
+* **Få tal**: hurtigt og billigt, men kun grove grupper: dyr, mad, steder
+
+* **Mange tal**: plads til nuancer, men kræver meget mere hukommelse
+
+| Model | Tal pr. ord |
+|---|---|
+| word2vec (2013) | 300 |
+| GPT-2 small og BERT-base | 768 |
+| GPT-3 (175 milliarder parametre) | 12.288 |
+| GPT-4 og nyere | ikke offentliggjort |
+
+## Rigtige danske ordvektorer
+
+Den danske model `da_core_news_md` fra spaCy har 300 tal pr. ord. Med PCA kan man presse de 300 ned til 2 og tegne dem:
+
+![](resources/fig-pca-politik.png){width="52%" fig-align="center"}
+
+::: {.lille}
+Koden ligger i `lav_figurer.py`. Den kræver spaCy og den danske model, så den kører ikke i browseren.
+:::
+
+## PCA: fra 300 tal til 2
+
+Hvert ord i figuren er **300 tal**. *Velfærd* begynder sådan her:
+
+```
+velfærd = [-0.58, 0.88, -0.28, 1.54, 0.47, … 295 tal mere]
+```
+
+Et punkt med 2 tal kan tegnes på et papir: ét tal hen ad, ét op ad. Et punkt med 3 tal kan man forestille sig i et rum. Men 300 tal kan man værken tegne eller se for sig.
+
+::: {.fragment}
+**PCA** — *Principal Component Analysis* — er en måde at vælge de **to retninger**, hvor ordene er mest forskellige, og så tegne dem på dem.
+
+Tænk på det som en **skygge** af dataen. 
+:::
+
+## PCA i tre trin {.kodelab}
+
+Seks ord med tre tal hver: *ligner et dyr*, *ligner mad*, *størrelse*. Vi presser dem ned i to.
+
+:::: {.proev}
+```{pyodide}
+import numpy as np
+
+ord = ["kat", "hund", "hest", "æble", "pære", "melon"]
+tal = np.array([
+    [0.9, 0.1, 0.3],     # dyr, mad, størrelse
+    [0.8, 0.2, 0.4],
+    [0.9, 0.1, 0.9],
+    [0.1, 0.9, 0.2],
+    [0.2, 0.8, 0.2],
+    [0.1, 0.9, 0.7],
+])
+
+# 1: flyt midten af punkterne hen til 0
+centreret = tal - tal.mean(axis=0)
+
+# 2: find de retninger, hvor punkterne spreder sig mest
+_, s, retninger = np.linalg.svd(centreret, full_matrices=False)
+andel = s**2 / (s**2).sum()
+
+# 3: læg hvert punkt ned på de to vigtigste retninger
+to_d = centreret @ retninger[:2].T
+
+for o, (x, y) in zip(ord, to_d):
+    print(f"{o:<6} {x:6.2f} {y:6.2f}")
+print()
+print(f"PC1 fanger {andel[0]:.0%}, PC2 {andel[1]:.0%}")
+```
+
+::: {.forklaring}
+1. {3-11} Seks ord med tre tal hver: *ligner et dyr*, *ligner mad*, *størrelse*.
+2. {13-14} Trin 1: træk gennemsnittet fra, så punkternes midte ligger i 0.
+3. {16-18} Trin 2: `svd` finder retningerne, hvor punkterne spreder sig mest. `andel` er, hvor stor en del af forskellene hver retning fanger.
+4. {20-21} Trin 3: læg hvert punkt ned på de to vigtigste retninger. `@` er matrixmultiplikation.
+5. {23-26} Vis de to nye tal for hvert ord, og hvor meget de to akser fanger.
+:::
+::::
+
+## Hvad PCA fandt
+
+**PC1** skiller dyrene fra frugten: de ligger på hver sin side af 0. **PC2** skiller de store fra de små: *hest* og *melon* ligger øverst. Ingen har fortalt PCA, hvad akserne betyder. Den har bare fundet, hvor forskellene er størst.
+
+::: {.lille}
+Linjen med `svd` er den eneste svære. I behøver ikke forstå den. Den finder retningerne — resten er minus og gange.
+:::
+
+## Hvordan man læser figuren
+
+* **Ord tæt på hinanden** har lignende tal i de 300 dimensioner. Det er det eneste, figuren lover.
+
+* **Akserne har ingen navne.** PC1 og PC2 er bare *den retning med mest forskel* og *den næstmest*. Hvad de betyder, må vi selv gætte — og vi kan tage fejl.
+
+* **Retningen kan vende.** Kører man koden igen, kan hele figuren være spejlvendt. Det ændrer ikke, hvem der ligger tæt på hvem.
+
+* **Skyggen mister noget.** For de otte politiske ord fanger de to akser **59 %** af forskellene. De sidste 41 % er væk. To ord, der ligger tæt i figuren, kan ligge langt fra hinanden i de dimensioner, vi ikke ser.
+
+## Hvor kommer tallene fra?
+
+::: {.incremental}
+
+* I starten af træningen er tallene **tilfældige**. *Kat* og *hund* har intet til fælles.
+
+* Modellen skal hele tiden gætte det næste ord. Hver gang den gætter forkert, justerer den tallene en lille smule.
+
+* Ord, der bruges i de samme sammenhænge, ender derfor med at få **lignende tal**. *Kat* og *hund* står begge efter ord *fodre* og før *sover*.
+
+:::
+
+::: {.fragment}
+Det er den samme idé som i Naive Bayes: **man lærer, hvad et ord betyder, af de ord, der står omkring det.**
+:::
+
+# Næste ord
+
+Den simpleste sprogmodel.
+
+## Markov-kæden trin for trin
+
+En **Markov-kæde** gætter det næste ord ud fra det ord, der står lige nu. Kun det, intet andet.
+
+::: {.incremental}
+1. **Læs teksten** som en lang række ord.
+2. **Gå ordene igennem to og to.** For hvert par skriver man ned: *efter* barometeret *kom* viser.
+3. **Saml det i en ordbog.** Nøglen er et ord, værdien er alle de ord, der er kommet efter det:
+
+   ```
+   "barometeret": ["viser", "viser", "siger", "viser"]
+   "viser":       ["tre", "aldrig", "hvor"]
+   ```
+
+4. **Generér.** Start med et ord. Slå det op. Vælg et af de ord, der stod efter det. Gentag.
+:::
+
+::: {.fragment}
+Det er kapitel 10 og 12: en ordbog, hvor værdierne er lister. Navnet kommer fra den russiske matematiker Andrej Markov, der i 1913 talte vokaler og konsonanter i et digt af Pusjkin.
+:::
+
+## Markov-kæden i hånden
+
+Start med *barometeret*. Vælg det hyppigste næste ord nogle gange, eller vælg tilfældigt. Hvad sker der?
+
+::: {.figur figur="markov" start="barometeret" tekst="barometeret viser tre tal . barometeret viser aldrig ét tal . barometeret siger intet om årsager . tallene er syntetiske . barometeret viser hvor arbejdspladsen ligger ."}
+:::
+
+## Den simpleste sprogmodel {.kodelab}
+
+I Think Python (kapitel 12) laves tekst med en **Markov-kæde**: tæl, hvilket ord der kommer efter hvilket, og brug tællingen til at gætte.
+
+:::: {.proev gaet="Hvad tror I, den sidste linje bliver?"}
+```{pyodide}
+tekst = """barometeret viser tre tal . barometeret viser aldrig ét tal .
+barometeret siger intet om årsager . tallene er syntetiske .
+barometeret viser hvor arbejdspladsen ligger ."""
+
+# Tæl, hvilket ord der kommer efter hvilket — med en ordbog af ordbøger
+efter = {}
+ordene = tekst.split()
+for ord1, ord2 in zip(ordene, ordene[1:]):
+    if ord1 not in efter:
+        efter[ord1] = {}
+    efter[ord1][ord2] = efter[ord1].get(ord2, 0) + 1
+
+print("Efter 'barometeret':", efter["barometeret"])
+print("Efter 'viser':      ", efter["viser"])
+print()
+print("Sprogmodellen i praksis:")
+
+# Generér: vælg hver gang det hyppigste næste ord
+ord = "barometeret"
+saetning = [ord]
+for _ in range(5):
+    ord = max(efter[ord], key=efter[ord].get)
+    saetning.append(ord)
+print()
+print(" ".join(saetning))
+```
+
+::: {.forklaring}
+1. {1-3} Den lille tekst, modellen lærer af. Punktummerne står som ord for sig.
+2. {6-7} En tom ordbog og teksten delt op i ord.
+3. {8} `zip(ordene, ordene[1:])` parrer hvert ord med ordet lige efter.
+4. {9-10} Første gang vi ser et ord, får det sin egen lille ordbog.
+5. {11} Tæl én op for det ord, der kom efter. `.get(ord2, 0)` giver 0, hvis vi ikke har set det før.
+6. {13-14} Vis tællingen for to af ordene.
+7. {19-23} Generér: start med *barometeret*, og vælg fem gange det hyppigste næste ord. `max(..., key=...)` finder nøglen med den største værdi.
+8. {25} Sæt ordene sammen til én tekst.
+:::
+::::
+
+::: {.fragment .lille}
+Den kører i ring: *barometeret viser tre tal . barometeret …*. Den kan kun se **ét** ord tilbage, og efter *tal* kommer der altid et punktum. Den ved ikke, at den lige har sagt det.
+:::
+
+## Tilfældighed og hukommelse {.kodelab}
+
+Før valgte vi altid det **hyppigste** ord, og kæden kørte i ring. Nu vælger vi **tilfældigt** — men et ord, der står tre gange i listen, har tre gange så stor chance.
+
+:::: {.proev forslag="Kør cellen flere gange. Står nogen af sætningerne i teksten?"}
+```{pyodide}
+import random
+
+tekst = """barometeret viser tre tal . barometeret viser aldrig ét tal .
+barometeret siger intet om årsager . tallene er syntetiske .
+barometeret viser hvor arbejdspladsen ligger ."""
+ordene = tekst.split()
+
+# Hvilke ord er kommet efter hvert ord?
+efter = {}
+for ord1, ord2 in zip(ordene, ordene[1:]):
+    if ord1 not in efter:
+        efter[ord1] = []
+    efter[ord1].append(ord2)
+
+print("Efter 'barometeret':", efter["barometeret"])
+print()
+
+# Tre sætninger, der hver starter med 'barometeret'
+for _ in range(3):
+    ord = "barometeret"
+    saetning = [ord]
+    for _ in range(7):
+        ord = random.choice(efter[ord])
+        saetning.append(ord)
+    print(" ".join(saetning))
+```
+
+::: {.forklaring}
+1. {9-13} Den samme optælling, men nu som lister: et ord, der kom efter tre gange, står tre gange i listen.
+2. {19-25} Tre sætninger på otte ord, der alle starter med *barometeret*.
+3. {23} `random.choice` vælger tilfældigt i listen. Et ord, der står tre gange, har tre gange så stor chance.
+:::
+::::
+
+::: {.fragment .lille}
+Kør cellen flere gange. Hver gang kommer der nye sætninger — og nogle af dem stod aldrig i teksten. Det er den samme idé som **temperaturen** om lidt: tilfældigheden er det, der gør en sprogmodel "kreativ".
+:::
+
+## Hvad kæden ikke kan
+
+::: {.incremental}
+
+* **Den har ingen hukommelse.** Efter *viser* ved den ikke, om sætningen startede med *barometeret* eller *tallene*. Den kan skrive *barometeret viser aldrig ét tal* og lige bagefter *barometeret viser tre tal* — og ser ikke modsigelsen.
+
+* **Mere hukommelse hjælper.** Think Python kapitel 12 kigger på **to** ord ad gangen. Efter *viser aldrig* er der kun ét mulige næste ord: *ét*. Teksten bliver mere rigtig — men også mere en kopi af originalen.
+
+* **Mere hukommelse koster.** Med ét ord tilbage har vores lille tekst 17 forskellige nøgler. Med to ord tilbage 20. Med ti ord tilbage har næsten hver nøgle kun været set én gang, og kæden kan kun gentage teksten ord for ord.
+
+:::
+
+::: {.fragment}
+Det er problemet, transformeren løser: den kan se **langt tilbage** uden at skulle have set præcis den samme række ord før. Den lærer, *hvilke* ord tidligere i teksten der er værd at kigge på.
+:::
+
+## Fra tal til sandsynligheder {.kodelab}
+
+En sprogmodel giver hvert muligt næste ord en score. **Softmax** laver scorerne om til sandsynligheder, der giver 1 tilsammen.
+
+:::: {.proev}
+```{pyodide}
+import math
+
+def softmax(scorer, temperatur=1.0):
+    eksp = {o: math.exp(s / temperatur) for o, s in scorer.items()}
+    i_alt = sum(eksp.values())
+    return {o: round(e / i_alt, 3) for o, e in eksp.items()}
+
+# Modellens score for næste ord efter "Katten sad på ..."
+scorer = {"måtten": 3.0, "stolen": 2.0, "taget": 1.5, "pizzaen": -1.0}
+
+print("temperatur 1.0:", softmax(scorer))
+print("temperatur 0.2:", softmax(scorer, 0.2))
+print("temperatur 3.0:", softmax(scorer, 3.0))
+```
+
+::: {.forklaring}
+1. {3} `softmax` får en score for hvert ord og en temperatur.
+2. {4} `math.exp` opløfter *e* i scoren (delt med temperaturen). Resultatet er altid positivt, og store scorer bliver meget store.
+3. {5-6} Del med summen, så tallene bliver sandsynligheder, der giver 1 tilsammen.
+4. {9} Modellens score for fire mulige næste ord.
+5. {11-13} De samme scorer ved tre temperaturer.
+:::
+::::
+
+## Skru på temperaturen
+
+**Temperaturen** er grunden til, at en chatbot svarer forskelligt på det samme spørgsmål. Træk i skyderen.
+
+::: {.figur figur="softmax" scorer="måtten:3.0;stolen:2.0;taget:1.5;pizzaen:-1.0"}
+:::
+
+::: {.lille}
+Lav temperatur: næsten altid det mest sandsynlige ord. Høj temperatur: mere tilfældigt og mere "kreativt".
+:::
+
+## Tokens {.kodelab}
+
+Modellen ser ikke ord, men **tokens**: tal fra et fast ordforråd.
+
+:::: {.proev gaet="Hvad bliver \"Hunden\" til?" valg="0|10|En fejl"}
+```{pyodide}
+ordforraad = {"katten": 10, "sad": 15, "på": 42, "måtten": 77, "<ukendt>": 0}
+
+def tokeniser(tekst):
+    return [ordforraad.get(o, ordforraad["<ukendt>"]) for o in tekst.lower().split()]
+
+print(tokeniser("Katten sad på måtten"))
+print(tokeniser("Hunden sad på måtten"))
+```
+
+::: {.forklaring}
+1. {1} Et lille ordforråd: hvert ord har et fast tal. `<ukendt>` er til ord, modellen aldrig har set.
+2. {3-4} `.lower().split()` gør teksten til små bogstaver og deler den i ord. `.get(o, …)` slår hvert ord op og giver tallet for `<ukendt>`, hvis ordet ikke findes.
+3. {6-7} To sætninger, der kun er forskellige i ét ord.
+:::
+::::
+
+# Transformeren
+
+Hvordan en model ved, hvad "det" henviser til.
+
+## Problemet med ét ord tilbage
+
+> **"Dyret krydsede ikke vejen, fordi det var for træt."**
+
+Når vi læser *det*, finder vores hjerne automatisk ud af, at det er *dyret* og ikke *vejen*. Veje bliver ikke trætte.
+
+::: {.fragment}
+Markov-kæden kan ikke. Den ser kun *fordi*. For at forstå *det* skal man kunne kigge **langt tilbage** og vide, hvad der er værd at kigge på.
+:::
+
+## Self-attention: hvem skal jeg lytte til?
+
+For hvert ord spørger modellen: *hvilke andre ord skal jeg se på for at forstå det her?*
+
+* Hvert ord har en **query**: *hvad leder jeg efter?*
+
+* Hvert ord har en **key**: *hvad har jeg at byde på?*
+
+* Og en **value**: *det, jeg giver videre, hvis nogen lytter*
+
+Hvor godt en query og en key passer sammen, måles med et **prikprodukt**: gang tallene parvis, og læg dem sammen. Derefter softmax. Hele formlen:
+
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^{T}}{\sqrt{d_k}}\right)V
+$$
+
+## Hvem lytter "det" til?
+
+Tryk *Næste trin*. Tallene er de samme som i koden på næste slide.
+
+::: {.figur figur="attention" saetning="Dyret krydsede ikke vejen , fordi det var for træt ." fra="det" noegler="dyret:0.9:0.8;vejen:0.1:0.9;træt:0.6:0.3" query="1.0:0.4" skala="3"}
+:::
+
+## Attention i miniature {.kodelab}
+
+:::: {.proev}
+```{pyodide}
+import math
+
+def softmax(scorer):
+    eksp = {o: math.exp(s) for o, s in scorer.items()}
+    return {o: e / sum(eksp.values()) for o, e in eksp.items()}
+
+# Små vektorer, selvopfundne værdier, så mekanikken kan ses.
+# I en rigtig model er de lært, og har hundredvis af tal.
+noegle = {
+    "dyret": [0.9, 0.8],
+    "vejen": [0.1, 0.9],
+    "træt":  [0.6, 0.3],
+}
+spoergsmaal_fra_det = [1.0, 0.4]     # "det" leder efter noget levende
+
+def prik(a, b):
+    return sum(x * y for x, y in zip(a, b))
+
+scorer = {o: prik(spoergsmaal_fra_det, k) * 3 for o, k in noegle.items()}
+vaegte = softmax(scorer)
+
+for o, v in vaegte.items():
+    print(f"{o:<6} {v:.0%}  {'█' * round(v * 30)}")
+```
+
+::: {.forklaring}
+1. {3-5} Softmax fra før, uden temperatur.
+2. {9-13} En **key** til hvert af de ord, *det* kan lytte til.
+3. {14} Den **query**, *det* sender ud.
+4. {16-17} Prikproduktet: gang tallene parvis, og læg dem sammen. Jo bedre query og key passer, desto større.
+5. {19} En score til hvert ord. Ganget med 3, så forskellene bliver tydelige.
+6. {20} Softmax laver scorerne om til vægte, der giver 1 tilsammen.
+7. {22-23} Vis vægtene som procent og som en søjle af tegn.
+:::
+::::
+
+::: {.fragment}
+*Det* lytter mest til *dyret*. I en rigtig model er query og keys ikke selvopfundne. De er **lært**, ikke skrevet af et menneske som i ekspertsystemerne, fordi det hjalp med at gætte det næste ord. Efter *det var for* er *træt* et meget bedre gæt, hvis man ved, at *det* er et dyr.
+:::
+
+## Rækkefølgen
+
+**Opmærksomhed** i sig selv er blind for rækkefølgen. *Hunden bed manden* og *manden bed hunden* ville se ens ud.
+
+::: {.incremental}
+
+* **Positionsvektorer** lægger information om pladsen oveni hvert ord: *jeg er ord nummer 1*, *jeg er ord nummer 2*.
+
+* Så kan modellen lære mønstre, der afhænger af rækkefølgen. Fx at *sad katten?* er et spørgsmål, og *katten sad* ikke er.
+
+:::
+
+## Hele vejen igennem
+
+Tryk *Næste trin*, og følg *"Katten sad på"* fra tekst til næste ord.
+
+::: {.figur figur="lag" retur="nej" start="Teksten går ind øverst." lag="Tokenisering|fx [10, 15, 42];Ordvektorer|3 × 768 tal;+ positionsvektorer|hvert ord får sin plads med;Transformer-lag 1|attention;Transformer-lag 2 … 12|12 lag i GPT-2 small;Én score pr. ord i ordforrådet|ca. 50.000 tal;Softmax|måtten 62 %, stolen 23 %, taget 14 % …"}
+:::
+
+::: {.fragment}
+Alt det her lærer modellen ved at gætte det næste ord, igen og igen, på milliarder af eksempler. Ingen fortæller den *lær grammatik*. Det kommer, fordi det hjælper med at gætte.
+:::
+
+# Fra GPT-2 til ChatGPT
+
+Fra en model, der fortsætter tekst, til en, der svarer.
+
+## Fortræning
+
+Modellen lærer på enorme mængder tekst:
+
+* Websider, fx Common Crawl
+* Bøger
+* Wikipedia
+* Kode fra GitHub
+
+GPT-3 blev trænet på omkring **300 milliarder tokens**.
+
+::: {.fragment}
+Det kaldes **selvsuperviseret** læring. Der er ingen, der har sat facit på, som i et spamfilter. Teksten *er* facit. Det næste ord står netop i teksten.
+:::
+
+## Grundmodel og chatmodel
+
+1. **Grundmodellen** kan kun én ting: fortsætte en tekst. Spørger man den om noget, fortsætter den måske med flere spørgsmål.
+
+2. **Chatmodellen** er grundmodellen trænet videre: først på eksempler af gode svar skrevet af mennesker, så med menneskers vurderinger af, hvilke svar der er bedst. 
+
+## Hvor stor er en model? {.kodelab}
+
+:::: {.demo}
+```{pyodide}
+modeller = {
+    "GPT-2 small": 124e6,
+    "GPT-2 XL":    1.5e9,
+    "Llama 2 7B":  7e9,
+    "Llama 2 70B": 70e9,
+    "GPT-3":       175e9,
+}
+
+print(f"{'model':<12} {'32 bit':>10} {'16 bit':>10}")
+for navn, parametre in modeller.items():
+    gb32 = parametre * 4 / 1e9      # hvert tal fylder 4 byte med 32 bit
+    gb16 = parametre * 2 / 1e9      # og 2 byte med 16 bit
+    print(f"{navn:<12} {gb32:>8.1f} GB {gb16:>8.1f} GB")
+```
+
+::: {.forklaring}
+1. {1-7} Antallet af parametre (lærte tal) i fem modeller. `124e6` betyder 124 · 10⁶: 124 millioner.
+2. {9} Overskriften. `:<12` og `:>10` sætter kolonnerne på linje.
+3. {11} Med 32 bit fylder hvert tal 4 byte. Del med 10⁹ for at få gigabyte.
+4. {12} Med 16 bit fylder hvert tal 2 byte.
+5. {13} Én linje pr. model.
+:::
+::::
+
+GPT-2 small kan køre på en bærbar. De store kræver mange grafikkort — og derfor sidder de på servere hos dem, der har råd til dem. Det har betydning for, hvem der bestemmer over dem.
+
+## Prøv GPT-2 derhjemme
+
+GPT-2 small er gratis og lille nok til en bærbar. Det kræver pakkerne `transformers` og `torch`, og første gang hentes modellen på omkring 500 MB.
+
+```python
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
+
+model = GPT2LMHeadModel.from_pretrained("gpt2")
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+print(f"Modellen har {model.num_parameters():,} parametre")
+
+tekst = "The girl and the boy"
+ids = tokenizer.encode(tekst, return_tensors="pt")
+ud = model.generate(ids, max_length=25, pad_token_id=tokenizer.eos_token_id)
+print(tokenizer.decode(ud[0], skip_special_tokens=True))
+```
+
+::: {.fragment}
+Med fire linjer får man **alle de lærte tal**, hele transformer-strukturen, tokenizeren og koden til at generere. Det er grundmodellen: den fortsætter teksten, den svarer ikke.
+:::
+
+# Hvad sker der indeni?
+
+Og hvorfor det er så svært at svare på.
+
+## Tænker sprogmodeller?
+
+Anthropic, der laver Claude, har prøvet at kigge ind i en sprogmodel og følge, hvad der sker undervejs ([*Tracing the thoughts of a large language model*](https://www.anthropic.com/research/tracing-thoughts-language-model)). Tre af fundene:
+
+::: {.incremental}
+
+* **Den planlægger.** Når den skriver et rimende digt, har den valgt rimordet, før den skriver linjen, der skal ende på det.
+
+* **Den tager mellemregninger.** Spørger man om hovedstaden i den stat, Dallas ligger i, finder den først *Texas* og derefter *Austin*.
+
+* **Dens forklaring er ikke dens metode.** Den lægger tal sammen ad flere veje på én gang. Men spørger man, hvordan den gjorde, beskriver den den metode, man lærer i skolen.
+
+:::
+
+[5 min]{.timer tid=300}
+
+## Forklaringen er ikke mekanismen
+
+Det sidste fund er vigtigt for jer.
+
+::: {.incremental}
+
+* En sprogmodel kan give en **plausibel forklaring**, som ikke er den måde, den faktisk nåede frem til svaret på.
+
+* Det er *black box*-problemet.
+
+* Og det er det tidligere spørgsmål om hvorvidt *vi (mennesker) stadig skal kode?* Hvis en chatbot skriver jeres kode og forklarer den, ved I så, hvad koden gør?
+
+:::
+
+::: {.fragment}
+Skim den lange tekst, [*On the Biology of a Large Language Model*](https://transformer-circuits.pub/2025/attribution-graphs/biology.html). I behøver ikke forstå den. Pointen er at se, hvor meget arbejde det kræver at forklare ét enkelt svar.
+:::
+
+# Bias i ordvektorer
+
+Modellen lærer også det, der er skævt i teksterne.
+
+## Bias er indbygget
+
+Sprogmodeller lærer af tekst fra bøger, websider og sociale medier. De lærer ikke *"læger ER mænd"* som en holdning, men hvis teksterne oftere skriver *han* om en læge, ender *læge* tættere på *han* i tallene.
+
+::: {.fragment}
+Med ordvektorer kan man **måle** det: lav en akse fra *hun* til *han*, og se, hvor erhvervene ligger på den.
+
+```python
+han = np.mean([t.vector for t in nlp("han mand far dreng")], axis=0)
+hun = np.mean([t.vector for t in nlp("hun kvinde mor pige")], axis=0)
+koensakse = han - hun
+
+for erhverv in ["læge", "sygeplejerske", "ingeniør", "lærer",
+                "direktør", "sekretær", "pilot", "stewardesse"]:
+    score = np.dot(nlp(erhverv)[0].vector, koensakse)
+```
+:::
+
+## Erhverv på kønsaksen
+
+![](resources/fig-koensakse.png){width="85%" fig-align="center"}
+
+[5 min]{.timer tid=300}
+
+> Hvad ser I? Er der noget, der overrasker jer?
+
+## Tre ting at se
+
+* *Direktør* og *ingeniør* ligger længst mod *han*. *Sygeplejerske* ligger længst mod *hun*. Det er mønsteret fra de engelske eksempler.
+
+* Men *læge* ligger mod *hun*: det modsatte af et berømt engelsk eksempel. Danske tekster er ikke engelske tekster.
+
+* Og *pilot* og *stewardesse* står **præcis** lige: 63,46. Det er ikke et tilfælde.
+
+## Tjek tallene
+
+`da_core_news_md` har **500.000 ord, men kun 20.000 forskellige vektorer**. For at spare plads låner sjældne ord vektoren fra et almindeligt ord, der ligner.
+
+*Stewardesse* har lånt *pilots* vektor. Modellen kan slet ikke se forskel på de to.
+
+# Workshop
+
+Spørg en chatbot, og tjek svaret.
+
+## Øvelse 1: Spørg en chatbot
+
+[20 min]{.timer tid=1200}
+
+:::: {.to-kol .bred-smal}
+::: {.kol .lille}
+Giv en chatbot de samme tal, men fra hver jeres computer/profil:
+
+> *En privat industrivirksomhed i Nordjylland har 60 ansatte. 10 % er kvinder, hvilket er i den laveste fjerdedel. 40 % er 55 år eller ældre, hvilket er i den højeste fjerdedel. 13 % har indvandrerbaggrund, hvilket er i midten. Der var ikke tal nok til at sammenligne med private virksomheder, så de sammenlignes med industrivirksomheder med 50–99 ansatte i begge sektorer. Skriv en kort forklaring til virksomhedens HR-afdeling.*
+:::
+
+::: {.kol}
+**Tjek svaret:**
+
+1. Er alle tal **rigtige**?
+2. Siger den noget om **årsager**?
+3. Giver den **ét samlet tal** eller en karakter?
+4. Giver den **råd**, ingen har bedt om?
+5. Kør den samme forespørgsel igen i en ny chat. Får I **det samme svar**?
+:::
+::::
+
+# Afslutning
+
+Hele forløbet på én side.
+
+## Hele workshop-forløbet på én side
+
+| Lektion | Det, I lærte | Det, det blev til i barometeret |
+|---|---|---|
+| 1 | Alt er tal. En regel kan blive til et program | — |
+| 2 | Python | værktøjet |
+| 3 | Git, forks, merge | jeres fælles repository |
+| 5 | Klasser og design | `Arbejdsplads`, `Referencetal`, `DESIGN.md` |
+| 6 | Workshop | figuren, beskeden, opslaget, appen |
+| 8 | SQL, databaser og API'er | `data/` som en database uden server |
+| 9 | Plain text og markup | hjemmesiden |
+
+## Det, I har bygget
+
+* En **kerne** i ren Python
+
+* En **app** med tre faner, og en **hjemmeside** på nettet
+
+* Et **designdokument**, hvor beslutningerne står 
+
+# Eksamen
+
+Alt om prøven står på [eksamenssiden](../../eksamen.html).
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+En sprogmodel gætter det næste ord. Ordene er vektorer, attention bestemmer, hvad der er værd at kigge på, og alt er lært af tekst, også det skæve.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Tjek chatbottens svar fra øvelse 1: tallene, årsagerne og rådene.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Eksamen](../../eksamen.html). Se også [alle lektioner](../../kursus/plan.html).
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

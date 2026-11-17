@@ -1,0 +1,38 @@
+---
+title: "Workshop: mini-projektet"
+lektion: 6
+date: 2026-10-05
+description: "Opsamling på Git (branches, .gitignore, fetch og pull), og så arbejder vi videre med barometerets kode."
+workshop: "Mini-projektet"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Downey (2024), kap. 8–13"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 08.15–12.00 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Vi arbejder med og udvider vores mini-projekter som introduktion til forskellige af Pythons kerneprincipper. Der er ingen forelæsning, kun en kort opsamling på Git.
+
+## Workshop
+
+I arbejder videre med barometerets kode og udvider det mod noget, der kan udgives.
+
+## Forberedelse og litteratur
+
+- Downey (2024): *Think Python*, kapitel 8, 9, 10, 11, 12 og 13.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

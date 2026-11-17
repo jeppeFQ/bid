@@ -1,0 +1,748 @@
+---
+title: "Intro til Python"
+subtitle: "Lektion 02"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: turkis
+pyodide:
+  packages:
+    - matplotlib
+---
+
+## I dag
+
+1. **Fire ting fra sidste gang.**
+2. **Sådan taler I med Python.** Filen, terminalen og `print()`.
+3. **Byggestenene.** Variable, typer, funktioner, metoder, lister, betingelser og løkker.
+4. **Fejl og fejlbeskeder.**
+5. **Øvelser.** I koder selv.
+
+# Fire ting fra sidste gang
+
+Det, resten af i dag bygger på.
+
+## (1) Alt er tal {.kodelab}
+
+Tekst er tal. Billeder er tal. Lyd er tal. Et spillebræt er tal.
+
+:::: {.proev forslag="Skriv jeres eget navn i stedet for `\"Hej\"` i linje 4. Fylder det flere bytes, end det har bogstaver?"}
+```{pyodide}
+print(ord("A"))                      # bogstavet A er tallet 65
+print(chr(65))                       # og den anden vej
+
+print(list("Hej".encode("utf-8")))   # hele ordet som bytes
+print(list("Håb".encode("utf-8")))   # å fylder to
+```
+
+::: {.forklaring}
+1. {1} `ord("A")` giver tegnets nummer. Bogstavet A er tallet 65.
+2. {2} `chr(65)` går den anden vej: fra nummer til tegn.
+3. {4} `"Hej".encode("utf-8")` laver teksten om til de bytes, der ligger på disken. `list(...)` viser dem som tal.
+4. {5} `å` fylder to bytes. Derfor er der fire tal, selvom ordet kun har tre bogstaver.
+:::
+::::
+
+::: {.lille}
+Det er den egenskab, alt andet hviler på: når alting er tal, kan alting behandles med den samme maskine.
+:::
+
+## {.udsagn}
+
+Maskinen er **"dum", hurtig og pålidelig**.
+
+Den kan gemme tal, sammenligne værdier, hoppe rundt i koden og gentage sig selv. Det er alt. Men den gør det milliarder af gange i sekundet uden at blive træt og uden at lave fejl.
+
+Den gætter ikke. Den spørger ikke, hvad I mente. **Den gør præcis det, der står.**
+
+## (3) Præcision er nøglen
+
+> "Kan du hente en kop kaffe?"
+
+Vi forstår det underforståede: **gå ud i køkkenet, tag en kop, hæld kaffe i koppen, kom tilbage.**
+
+Maskinen forstår ingenting underforstået. Alt skal stå der.
+
+::: {.lille}
+Det er derfor, I skriver `total = 0` *før* løkken i en af dagens øvelser.
+:::
+
+## (4) En regel bliver til et program
+
+Sidste gang så I en kommunal tilskudsregel skrevet som Python, og hvordan afgørelsen skiftede, da ét tal i koden blev ændret.
+
+**I dag prøver I selv at skrive den slags regler.**
+
+## Fra tanke til handling i fire niveauer
+
+::::: {.trin-kort}
+:::: {.kol}
+1 · Tanke
+
+"Jeg vil finde gennemsnittet af mine salgstal."
+::::
+
+:::: {.kol}
+2 · Algoritme
+
+"Læg alle tallene sammen, og divider med antallet."
+::::
+
+:::: {.kol}
+3 · Kode
+
+```python
+sum(tal) / len(tal)
+```
+::::
+
+:::: {.kol}
+4 · Maskinsprog
+
+```
+10110000 01100001
+```
+::::
+:::::
+
+Python-fortolkeren klarer springet fra 3 til 4. **Springet fra 1 til 2 er jeres arbejde**, og det er det svære.
+
+# Sådan taler I med Python
+
+En fil, en terminal og én funktion: `print()`.
+
+## To steder at køre kode i dag
+
+:::: {.to-kol}
+::: {.kol}
+**En fil på jeres maskine**
+
+I skriver i en editor, gemmer og kører filen i terminalen:
+
+```bash
+python3 mit-program.py
+```
+
+Programmet er en fil. Den kan gemmes, deles og køres igen.
+:::
+
+::: {.kol}
+**En notebook**
+
+Kode i celler, som her i slides. Hver celle køres for sig.
+
+Godt til at prøve noget af og til dataanalyse. Mindre egnet til at *bygge* noget.
+:::
+::::
+
+## `print()`: maskinen siger ikke noget af sig selv {.kodelab}
+
+Python regner gerne noget ud uden at fortælle jer det. Vil I se resultatet, skal I bede om det.
+
+:::: {.proev forslag="Slet `print` i linje 3, så der kun står `(2 + 2)`. Hvad sker der med resten?" gaet="Cellen har ni linjer. Hvor mange linjer bliver skrevet ud?" valg="3|4|9"}
+```{pyodide}
+2 + 2         # der sker noget, men I ser det ikke
+
+print(2 + 2)  # nu ser I det
+
+print("Salg:", 4700, "kr.") # flere ting, adskilt af komma
+
+navn = "Ida"
+print(f"Hej {navn}")   
+# f-streng: variablen sættes ind i teksten
+```
+
+::: {.forklaring}
+1. {1} Python regner 2 + 2 ud, men viser ikke svaret. Det bliver smidt væk.
+2. {3} `print(...)` viser det, der står i parentesen.
+3. {5} Flere ting adskilles af komma. `print` sætter selv et mellemrum imellem.
+4. {7} Teksten `"Ida"` gemmes under navnet `navn`.
+5. {8} Et `f` foran anførselstegnet giver en **f-streng**: det, der står i krøllede parenteser, bliver skiftet ud med variablens værdi.
+6. {9} Alt efter `#` er en kommentar. Den bliver ikke kørt.
+:::
+::::
+
+## Kommentarer {.kodelab}
+
+Alt efter `#` bliver ignoreret af Python. Det står der til mennesker.
+
+:::: {.proev}
+```{pyodide}
+# Grænsen er sat i § N, stk. x. Ændres den, skal sagsbehandlerne varsles.
+GRAENSE = 300000
+
+pris = 249 * 3   # tre stk.
+print(pris)
+```
+
+::: {.forklaring}
+1. {1} En hel linje, der er kommentar. Den forklarer, hvor tallet kommer fra, og hvad der skal ske, hvis det ændres.
+2. {2} Selve tallet. Uden linjen over er det bare et tal.
+3. {4} En kommentar kan også stå *efter* koden på samme linje.
+4. {5} Vis resultatet af regnestykket.
+:::
+::::
+
+Skriv **hvorfor**, ikke **hvad**. At tallet kommer fra § N, stk. x, kan ingen se af koden.
+
+# Byggestenene
+
+Otte begreber, som al Python-kode er bygget af.
+
+## Variable
+
+:::::: {.to-kol }
+::: {.kol}
+En variabel er et **navn, der peger på en værdi**.
+
+Lighedstegnet er ikke en påstand om, at de to sider er lige store. Det er en **ordre**: regn højresiden ud, og læg resultatet i navnet til venstre.
+
+Sådan ser hukommelsen ud, når cellen er kørt:
+
+::: {.figur figur="variabel" navne="pris,moms,total" vaerdier="200,25.0,125.0"}
+:::
+:::
+
+::::::: {.kol}
+:::: {.proev .stak gaet="Linje 7 ændrer pris til 200. Hvad skriver linje 8 ud?" valg="125.0|250.0|En fejl"}
+```{pyodide}
+pris = 100
+moms = pris * 0.25
+total = pris + moms
+
+print(total)
+
+pris = 200   # navnet peger nu på noget andet
+print(total) # men total blev regnet ud før omskrivning
+```
+
+::: {.forklaring}
+1. {1} Gem værdien 100 under navnet `pris`.
+2. {2} Hent værdien fra `pris`, gang med 0.25, og gem resultatet som `moms`.
+3. {3} Læg de to sammen, og gem resultatet som `total`.
+4. {5} Vis `total`.
+5. {7} Navnet `pris` peger nu på en ny værdi: 200.
+6. {8} `total` er uændret. Den blev regnet ud i linje 3, og Python regner ikke om af sig selv.
+:::
+::::
+:::::::
+::::::
+
+::: {.lille}
+Værdierne ligger i RAM: den hukommelse, vi kaldte *volatil* i lektion 1. Lukker I terminalen eller editoren, er de væk. Filen med koden overlever, hvis I gemmer den. Det, koden regnede ud, gør ikke.
+:::
+
+## Typer {.kodelab}
+
+Hver værdi har en **[type]{.ord}**. Typen bestemmer, hvad man må gøre med værdien.
+
+:::: {.proev forslag="Skriv `print(a + c)` på en ny linje nederst, og læs fejlbeskeden." gaet="Linje 9: hvad giver c + \"8\", når c er teksten \"42\"?" valg="50|428|En fejl"}
+```{pyodide}
+a = 42
+b = 3.5
+c = "42"
+d = True
+
+print(type(a), type(b), type(c), type(d))
+
+print(a + 8)      # tal plus tal
+print(c + "8")    # tekst plus tekst lægger dem i forlængelse
+print(int(c) + 8) # først når vi oversætter, kan vi regne
+```
+
+::: {.forklaring}
+1. {1-4} Fire værdier med hver sin type: et heltal, et kommatal, en tekst og en logisk værdi.
+2. {6} `type(...)` fortæller, hvilken type en værdi har: `int`, `float`, `str` og `bool`.
+3. {8} Tal plus tal: `+` lægger sammen.
+4. {9} Tekst plus tekst: `+` sætter de to tekster i forlængelse af hinanden.
+5. {10} `int(c)` oversætter teksten `"42"` til tallet 42. Først nu kan vi regne med det.
+:::
+::::
+
+::: {.lille}
+`42` og `"42"` ser ens ud for jer og er to helt forskellige ting for Python. Det er den hyppigste fejlkilde, når data læses ind, og en, I helt sikkert kommer til at møde.
+:::
+
+## Funktioner
+
+:::::: {.to-kol }
+::: {.kol}
+En **funktion** tager noget ind, gør noget ved det og giver noget tilbage.
+
+::: {.figur figur="funktion" navn="len" ind="en liste" ud="antal elementer"}
+:::
+
+I har allerede brugt fire: `print()`, `type()`, `int()` og `ord()`.
+:::
+
+::::::: {.kol}
+:::: {.proev .stak forslag="Find det mindste tal med `min(tal)`."}
+```{pyodide}
+tal = [4, 8, 15, 16, 23, 42]
+
+print(len(tal))                      # antal elementer
+print(sum(tal))                      # summen
+print(max(tal))                      # største værdi
+print(round(sum(tal) / len(tal), 2)) # gennemsnit, afrundet
+```
+
+::: {.forklaring}
+1. {1} En **liste** med seks tal, gemt under navnet `tal`.
+2. {3-5} Tre indbyggede funktioner. Hver tager hele listen ind og giver ét tal tilbage.
+3. {6} Funktioner kan sættes ind i hinanden. Python regner indefra og ud: først `sum(tal) / len(tal)`, så `round(..., 2)`, som afrunder til to decimaler.
+:::
+::::
+:::::::
+::::::
+
+## Jeres egne funktioner {.kodelab}
+
+Med `def` lærer I maskinen en ny kommando. Et [argument]{.ord} kan have en **standardværdi**, så I kun angiver det, når I vil have noget andet.
+
+:::: {.proev forslag="Kald funktionen med jeres egen liste: `beskriv([1, 2, 3], navn=\"Test\")`."}
+```{pyodide}
+def beskriv(vaerdier, navn="Datasæt"):
+    print(navn, "har", len(vaerdier), "værdier")
+    print("Gennemsnit:", sum(vaerdier) / len(vaerdier))
+
+tal = [4, 8, 15, 16, 23, 42]
+
+beskriv(tal)                  # bruger standardnavnet
+beskriv(tal, navn="Salgstal") # angiver navnet selv
+```
+
+::: {.forklaring}
+1. {1} `def` definerer en funktion med navnet `beskriv`. I parentesen står det, den skal have ind. `navn="Datasæt"` er en standardværdi.
+2. {2-3} De indrykkede linjer er opskriften. De bliver først kørt, når funktionen bliver kaldt.
+3. {5} En liste med seks tal.
+4. {7} Kald med ét argument: `navn` er derfor `"Datasæt"`.
+5. {8} Her angiver vi selv navnet.
+:::
+::::
+
+## `print` eller `return`?
+
+:::::: {.to-kol }
+::: {.kol}
+De to funktioner regner det **samme** ud. Men kun den ene giver svaret tilbage, så koden kan bruge det videre.
+
+::: {.figur figur="retur" tal="4,8,15,16,23,42"}
+:::
+:::
+
+::::::: {.kol}
+:::: {.proev .stak forslag="Skriv `print(beskriv(tal) + 2)` nederst, og læs fejlbeskeden."}
+```{pyodide}
+def beskriv(vaerdier):
+    print("Gennemsnit:", sum(vaerdier) / len(vaerdier))
+
+def gennemsnit(vaerdier):
+    return sum(vaerdier) / len(vaerdier)
+
+tal = [4, 8, 15, 16, 23, 42]
+
+svar = beskriv(tal)         # skriver på skærmen ...
+print("beskriv gav:", svar) # ... men gav ingenting tilbage
+
+print(gennemsnit(tal))           # her kommer værdien tilbage
+print(round(gennemsnit(tal), 1)) # så den kan sendes videre
+print(gennemsnit(tal) > 15)      # eller sammenlignes
+```
+
+::: {.forklaring}
+1. {1-2} `beskriv` skriver gennemsnittet på skærmen. Den har ingen `return`.
+2. {4-5} `gennemsnit` regner det samme ud, men **returnerer** tallet i stedet for at skrive det.
+3. {9} `beskriv(tal)` skriver på skærmen. Det, den giver tilbage, gemmes i `svar`.
+4. {10} `svar` er `None`: funktionen gav ingenting tilbage.
+5. {12} `gennemsnit(tal)` giver en værdi tilbage, som `print` kan vise.
+6. {13-14} Og fordi det er en værdi, kan den sendes videre til `round` eller sammenlignes med 15.
+:::
+::::
+:::::::
+::::::
+
+::: {.lille}
+En funktion uden `return` giver `None` tilbage. Det er ikke en fejl. Det er Pythons måde at sige *ingenting*.
+:::
+
+## Huskeregler: `print` og `return`
+
+::::: {.trin-kort}
+:::: {.kol}
+`print`
+
+Er til **mennesket foran skærmen**. Værdien er væk, så snart den er skrevet ud.
+::::
+
+:::: {.kol}
+`return`
+
+Er til **koden**. Værdien kommer tilbage og kan gemmes, regnes videre på eller gives til en anden funktion.
+::::
+
+:::: {.kol}
+Stop
+
+En funktion stopper ved `return`. Linjerne under bliver aldrig kørt.
+::::
+:::::
+
+**Tommelfingerregel:** en funktion, der *regner noget ud*, skal returnere. En funktion, der *fortæller noget*, må gerne printe. Og de to bør sjældent være den samme funktion.
+
+## Metoder {.kodelab}
+
+En **[metode]{.ord}** er en funktion, der hører til et bestemt objekt. I kalder den med et punktum: `objekt.metode()`. `len(tekst)` er en funktion, der får teksten ind. `tekst.upper()` er en metode, som teksten selv stiller til rådighed.
+
+:::: {.proev forslag="Tæl bogstavet `\"I\"` med stort i linje 6. Hvorfor bliver tallet et andet?"}
+```{pyodide}
+tekst = "  Udvikling af IT  "
+
+print(tekst.strip())            # fjerner mellemrum i hver ende
+print(tekst.strip().upper())    # metoder kan kædes sammen
+print(tekst.strip().split(" ")) # deler teksten op i en liste
+print(tekst.count("i"))         # tæller forekomster
+```
+
+::: {.forklaring}
+1. {1} En tekst med to mellemrum i hver ende.
+2. {3} `.strip()` fjerner mellemrum i begge ender.
+3. {4} Metoder kan **kædes**: først `.strip()`, og på resultatet `.upper()`, som laver alt til store bogstaver.
+4. {5} `.split(" ")` deler teksten ved hvert mellemrum og giver en liste af ord.
+5. {6} `.count("i")` tæller, hvor mange gange et lille `i` forekommer.
+:::
+::::
+
+::: {.lille}
+Hvilke metoder I har adgang til, afhænger af objektets type. En tekst kan noget andet end en liste. Derfor er `type()` nyttig, når noget ikke virker.
+:::
+
+## Lister: hver plads har et nummer
+
+En **liste** er flere værdier under ét navn. **Den første plads har nummer 0.**
+
+::: {.figur figur="indeks" elementer="8200,12400,9100,15600,7300" navn="salg" citat="nej" r="nej"}
+:::
+
+Et udsnit `salg[start:slut]` tager `start` med, men **ikke** `slut`. Træk i skyderne.
+
+## Lister i kode {.kodelab}
+
+:::: {.proev forslag="Hent de tre sidste tal med `salg[-3:]`."}
+```{pyodide}
+salg = [8200, 12400, 9100, 15600, 7300]
+
+print(salg[0])   # den første
+print(salg[-1])  # den sidste
+print(salg[1:3]) # index/plads 1 og 2, ikke 3 ...
+
+print(len(salg), sum(salg), max(salg))
+
+salg.append(11000) # en metode, der ændrer listen
+print(salg)
+```
+
+::: {.forklaring}
+1. {1} En liste med fem salgstal.
+2. {3} `salg[0]` er den første plads.
+3. {4} `salg[-1]` er den sidste. Negative tal tæller bagfra.
+4. {5} `salg[1:3]` er plads 1 og 2. Slutpladsen 3 er ikke med.
+5. {7} Tre funktioner på én gang: antal, sum og største værdi.
+6. {9} `.append(...)` er en metode, der **ændrer** listen: den sætter et nyt tal bagest.
+7. {10} Listen har nu seks tal.
+:::
+::::
+
+::: {.lille}
+At den første plads hedder 0, er den enkeltting, der skaber flest fejl i starten. Det skal bare blive en vane.
+:::
+
+## Logiske værdier {.kodelab}
+
+En **[boolean]{.ord}** kan kun være `True` eller `False`. Sammenligninger giver booleans tilbage, og dem bygger al filtrering af data på.
+
+:::: {.proev gaet="Hvad giver \"Hej\" == \"hej\" i linje 3?" valg="True|False|En fejl"}
+```{pyodide}
+print(8200 > 10000)
+print(8200 < 10000)
+print("Hej" == "hej") # to lighedstegn spørger. Ét tildeler.
+print(8200 != 7300)
+```
+
+::: {.forklaring}
+1. {1} Er 8200 større end 10000? Nej: `False`.
+2. {2} Er 8200 mindre end 10000? Ja: `True`.
+3. {3} To lighedstegn **spørger**, om de to sider er ens. Ét lighedstegn **tildeler**. Store og små bogstaver er forskellige tal, så svaret er `False`.
+4. {4} `!=` betyder *er forskellig fra*.
+:::
+::::
+
+## Betingelser
+
+:::::: {.to-kol }
+::: {.kol}
+`if` spørger. Linjerne under rykkes fire mellemrum ind: sådan ser Python, **hvad der hører sammen**. Indrykningen er ikke pynt.
+
+::: {.figur figur="gren" navn="salg" graenser="10000,5000" svar="Højt salg,Middel,Lavt" vaerdi="12400" max="20000"}
+:::
+:::
+
+::::::: {.kol}
+:::: {.proev .stak forslag="Byt om på de to betingelser, så `salg > 5000` står først. Kør igen. Hvad går galt?"}
+```{pyodide}
+salg = 12400
+
+if salg > 10000:
+    print("Højt salg")
+elif salg > 5000:
+    print("Middel")
+else:
+    print("Lavt")
+```
+
+::: {.forklaring}
+1. {1} Værdien, vi vil vurdere.
+2. {3-4} `if`: er salget over 10000? Hvis ja, køres den indrykkede linje, og resten springes over.
+3. {5-6} `elif` (*else if*): bliver kun spurgt, hvis svaret ovenfor var nej.
+4. {7-8} `else`: fanger alt det, der er tilbage.
+:::
+::::
+:::::::
+::::::
+
+::: {.lille}
+Rækkefølgen betyder noget. Python tager den **første** betingelse, der passer, og springer resten over.
+:::
+
+## Løkker: følg variablen
+
+En [løkke]{.ord} gør det samme igen og igen. Det er på mange måder grunden til, at en computer kan noget, et menneske ikke kan.
+
+::: {.figur figur="spor" tal="8200,12400,9100,15600,7300" maal="sum" navn="total" element="tal"}
+:::
+
+Tryk *Næste trin*, og følg `total` gennem løkken.
+
+## Løkker i kode {.kodelab}
+
+:::: {.proev forslag="Prøv det: flyt `total = 0` ind i løkken, og kør. Kan I forklare svaret?" gaet="Flyt total = 0 ind i løkken (lige under for-linjen). Hvad bliver totalen så?" valg="52600|7300|0"}
+```{pyodide}
+salg = [8200, 12400, 9100, 15600, 7300]
+
+total = 0               # skal stå FØR løkken
+for tal in salg:
+    total = total + tal # kører én gang pr. tal
+print("Total:", total)
+
+```
+
+::: {.forklaring}
+1. {1} Listen med de fem salgstal.
+2. {3} `total` starter på 0. Linjen skal stå **før** løkken, ellers bliver den nulstillet i hver omgang.
+3. {4} `for tal in salg:` tager ét tal ad gangen fra listen og kalder det `tal`.
+4. {5} Den indrykkede linje kører én gang pr. tal: læg tallet til det, vi har i forvejen.
+5. {6} Linjen er ikke indrykket, så den kører først, når løkken er færdig.
+:::
+::::
+
+## Tæl med en løkke {.kodelab}
+
+Samme mønster, men nu med en betingelse inde i løkken. Kør cellen på forrige slide først: listen `salg` kommer derfra.
+
+:::: {.proev forslag="Ret grænsen til `8000`. Hvor mange er der nu?"}
+```{pyodide}
+antal = 0
+for tal in salg:
+    if tal > 10000:
+        antal = antal + 1
+print("Over 10.000:", antal)
+
+```
+
+::: {.forklaring}
+1. {1} En tæller, der starter på 0.
+2. {2} Gå listen igennem, ét tal ad gangen.
+3. {3-4} Kun hvis tallet er over 10000, lægges der 1 til tælleren. Læg mærke til de to niveauer af indrykning: linje 4 hører til `if`, som hører til `for`.
+4. {5} Vis resultatet, når løkken er færdig.
+:::
+::::
+
+## `range()` {.kodelab}
+
+Når I ikke løber gennem en liste, men gennem en række tal.
+
+:::: {.proev forslag="Lav 9-tabellen fra 1 til 10." gaet="Hvad er det sidste tal, range(1, 6) giver?" valg="5|6|7"}
+```{pyodide}
+for i in range(1, 6):
+    print(f"7 x {i} = {7 * i}")
+```
+
+::: {.forklaring}
+1. {1} `range(1, 6)` giver tallene 1, 2, 3, 4 og 5. Løkken kalder dem `i`, ét ad gangen.
+2. {2} En f-streng: `{i}` og `{7 * i}` bliver skiftet ud med tallet og med regnestykkets resultat.
+:::
+::::
+
+`range(1, 6)` stopper **ved 5**, ikke ved 6. Det virker forkert, og det skal igen bare blive en vane.
+
+## Biblioteker {.kodelab}
+
+Et **bibliotek** er færdige funktioner, som andre har skrevet og delt. Python kan fx ikke selv tegne en graf. Det kan `matplotlib`.
+
+:::: {.proev forslag="Skriv `print(statistics.mean(salg))` nederst."}
+```{pyodide}
+import statistics
+import matplotlib.pyplot as plt
+
+salg = [8200, 12400, 9100, 15600, 7300]
+
+plt.bar(range(1, 6), salg)
+plt.ylabel("Salg (kr.)")
+plt.show()
+```
+
+::: {.forklaring}
+1. {1-2} `import` indlæser et bibliotek. `statistics` følger med Python. `matplotlib.pyplot` får kaldenavnet `plt`, så vi slipper for at skrive det lange navn hver gang.
+2. {4} De fem salgstal.
+3. {6} `plt.bar` tegner søjler: tallene 1 til 5 hen ad x-aksen og salget op ad y-aksen.
+4. {7} Tekst på y-aksen.
+5. {8} `plt.show()` viser figuren.
+:::
+::::
+
+::: {.lille}
+Et bibliotek **installeres** én gang med `pip install`, men **indlæses** hver gang med `import`. Her i slides er de installeret på forhånd. På jeres egen maskine skal I installere dem først. Det kommer vi til.
+:::
+
+# Fejl
+
+Fejlbeskeden er ikke en skideballe. Det er hjælp.
+
+## Fejlbeskeder
+
+Fejlbeskeden er den mest præcise hjælp, I får hele dagen. Den siger både **hvad** og **hvor**.
+
+::::: {.trin-kort}
+:::: {.kol}
+1 · Nedefra
+
+Læs **nedefra og op**. Den sidste linje siger, hvad der er galt.
+::::
+
+:::: {.kol}
+2 · Hvor
+
+Linjen over siger hvor: fil og linjenummer.
+::::
+
+:::: {.kol}
+3 · Linjen før
+
+Ved en `SyntaxError`: kig også på linjen **før** den, Python peger på. En glemt parentes opdages først på næste linje.
+::::
+:::::
+
+## De tre, I møder i dag
+
+| Beskeden | Det betyder |
+|---|---|
+| `SyntaxError: expected ':'` | Manglende kolon efter `if`, `for` eller `def` |
+| `IndentationError` | Linjerne under en `if` skal rykkes ind |
+| `NameError: name 'x' is not defined` | Stavefejl, eller linjen er ikke kørt endnu |
+
+::: {.lille}
+De øvrige står på arket om **fejlbeskeder**.
+:::
+
+# I gang med øvelser
+
+Fra slides til jeres egen maskine: notebooks i VS Code.
+
+## Opsamling
+
+- En **variabel** er et navn, der peger på en værdi. `=` er en ordre, ikke en ligning.
+- **Typen** bestemmer, hvad værdien er, og hvad man må gøre med den.
+- **Funktioner** tager noget ind og giver noget tilbage. I bruger andres og skriver jeres egne.
+- **Metoder** er funktioner, der hører til et objekt.
+- **Lister** samler flere værdier. Den første plads hedder 0.
+- **Booleans** er ja/nej-svar, og de driver enhver betingelse.
+- **Løkker** gentager. Det er dér, maskinen bliver til noget.
+
+## Sådan kommer I i gang
+
+1. Læg øvelsesfilerne fra Moodle ind i jeres mappe til kurset.
+2. Åbn **VS Code**.
+3. **Åbn mappen i VS Code**: `File` → `Open Folder…` → vælg jeres kursusmappe.
+4. Klik på `01-variable.ipynb` i listen til venstre.
+5. Øverst til højre: **Select Kernel** → `Python Environments…` → den øverste på listen.
+
+::: {.lille}
+Trin 3 er det vigtige. Åbner I kun selve øvelsesfilen, leder Python et tilfældigt sted efter jeres ting. Trin 5 skal I som udgangspunkt kun gøre én gang: VS Code husker valget til de næste notebooks.
+:::
+
+## Sådan kører I en celle
+
+En notebook er ikke ét program. Det er en samling små stykker kode, som I kører ét ad gangen.
+
+- `Shift + Enter` kører cellen og hopper videre til den næste.
+- `Ctrl + Enter` (`⌘ + Enter`) kører cellen og bliver stående.
+- Eller klik på **▷** til venstre for cellen.
+
+Tallet i `[ ]` til venstre er **rækkefølgen**, I har kørt cellerne i, ikke deres placering i dokumentet. `[7]` betyder: det her var det syvende stykke kode, I kørte.
+
+## Tre ting at huske
+
+::::: {.trin-kort}
+:::: {.kol}
+Rækkefølgen
+
+Springer I en celle over, findes dens variable ikke. Det er den hyppigste kilde til en `NameError` i en notebook.
+::::
+
+:::: {.kol}
+Det slettede er der stadig
+
+Sletter I en celle, bliver dens variable i hukommelsen. Koden kan virke hos jer og fejle hos alle andre.
+::::
+
+:::: {.kol}
+Gem
+
+`Ctrl + S` (`⌘ + S`). En prik i fanebladet betyder, at der er ugemte ændringer.
+::::
+:::::
+
+## Når noget er galt
+
+- **`NameError`**: I har sandsynligvis ikke kørt cellen over. Kør den, og prøv igen.
+- **Cellen kører bare og kører** (`[*]` står og blinker): I venter nok på et svar fra `input()`. Kig efter det lille skrivefelt **øverst** i vinduet.
+- **Alt opfører sig mærkeligt**: `Restart` og `Run All`. Det løser overraskende meget.
+
+::: {.lille}
+Finder VS Code ingen kernel: `Ctrl + Shift + P` (`⌘ + Shift + P`), skriv *Python: Select Interpreter*, vælg den øverste, og prøv **Select Kernel** igen.
+:::
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+`=` er en ordre, typen bestemmer, hvad man må, og maskinen gør præcis det, der står.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Øvelsesfilerne ligger på Moodle. Åbn hele **mappen** i VS Code, ikke kun filen.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion 3: Git og versionskontrol](../03-git-og-versionskontrol/index.html). Opret gerne en GitHub-konto inden.
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

@@ -1,0 +1,71 @@
+---
+title: "Værktøjer"
+subtitle: "Python, VS Code, terminalen, Git og sådan bruger I slides"
+---
+
+## Det, I skal have på maskinen
+
+Vi installerer det sammen i [lektion 1](../lektioner/01-computere-algoritmer-og-python/index.qmd). Regn med, at det driller for nogen. Det er normalt.
+
+1. **Python 3**: selve sproget og fortolkeren. Følg AAU's guide til installation af Python på [Moodle]({{< var moodle >}}).
+2. **En editor**: programmet, hvor I skriver koden. Vi bruger **VS Code**, som også kan køre Jupyter notebooks og har Git indbygget.
+3. **En terminal**: vinduet, hvor I taler direkte med maskinen. *Terminal* på macOS, *PowerShell* på Windows.
+4. **Git og en GitHub-konto** fra [lektion 3](../lektioner/03-git-og-versionskontrol/index.qmd). Opret gerne kontoen på forhånd: [github.com/signup](https://github.com/signup).
+
+Sørg for, at Python **kører** på jeres maskine inden lektion 2. Skriv til underviseren, hvis det driller. Det er lettere at løse nu end om fjorten dage, og større computerproblemer kan sendes videre til ITS.
+
+## Terminalen
+
+| Hvad vil I? | macOS (Terminal) | Windows (PowerShell) |
+|---|---|---|
+| Hvor er jeg? | `pwd` | `pwd` |
+| Hvad ligger her? | `ls` | `ls` |
+| Gå ind i en mappe | `cd 1-bid` | `cd 1-bid` |
+| Gå et niveau op | `cd ..` | `cd ..` |
+| Lav en ny mappe | `mkdir 1-bid` | `mkdir 1-bid` |
+| Hvilken Python? | `python3 --version` | `python --version` |
+| Kør et program | `python3 hej.py` | `python hej.py` |
+
+Bemærk `python3` mod `python`. Det er en af de klassiske kilder til forvirring.
+
+## Git
+
+| Hvad vil I? | Kommando |
+|---|---|
+| Hent et repository ned | `git clone <adresse>` |
+| Se, hvad der er ændret | `git status` |
+| Læg en ændring klar | `git add <fil>` |
+| Gem et øjebliksbillede | `git commit -m "Hvad og hvorfor"` |
+| Send til GitHub | `git push` |
+| Hent fra GitHub | `git pull` |
+
+Det hele kan også gøres med knapperne i VS Code. Se [lektion 3](../lektioner/03-git-og-versionskontrol/index.qmd).
+
+## Sådan bruger I slides
+
+Slides er hjemmesider, ikke PowerPoint. Det giver nogle muligheder:
+
+**Kør koden.** Kodeboksene kører Python direkte i jeres browser. Boksene mærket *Prøv selv* kan I ændre i og køre igen med **Kør**. **Nulstil** bringer den oprindelige kode tilbage. Boksene mærket *Demo* kører af sig selv. Første gang tager det lidt tid, fordi Python skal hentes ned i browseren. Den lille prik nederst til venstre siger til, når Python er klar.
+
+**Fold forklaringen ud.** Under hver kodeboks ligger *Forklaring af koden, trin for trin*. Peg på et punkt, så lyser den kodelinje op, punktet handler om.
+
+**Jeres kode bliver husket.** Det, I skriver i en kodeboks, ligger der stadig, når I åbner slides igen på samme computer.
+
+**Find rundt.**
+
+| Tast | Funktion |
+|---|---|
+| <kbd>→</kbd> / <kbd>←</kbd> eller <kbd>mellemrum</kbd> | Næste / forrige slide |
+| <kbd>M</kbd> | Menu med alle slides |
+| <kbd>O</kbd> | Oversigt |
+| <kbd>F</kbd> | Fuld skærm |
+| <kbd>?</kbd> | Alle genveje |
+
+**Værktøjerne øverst til højre.** Skift mellem lys og mørk tilstand, kopiér et link til det slide, I står på, eller skift til *læsevisning*, hvor alle slides står under hinanden. Det er godt på mobilen og til at læse op på stoffet.
+
+## Tilgængelighed
+
+- Slides kan betjenes med tastaturet alene, og fold-ud-forklaringerne virker med skærmlæser.
+- Brug browserens zoom (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> og <kbd>+</kbd>), hvis teksten er for lille.
+- Figurer har en tekstbeskrivelse, og animationer slås fra, hvis computeren er sat til *reducer bevægelse*.
+- Oplever I noget, der ikke virker for jer, så skriv til underviseren.

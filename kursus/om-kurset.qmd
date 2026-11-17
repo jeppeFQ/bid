@@ -1,0 +1,63 @@
+---
+title: "Om kurset"
+subtitle: "Udvikling af IT-systemer (1-BID) · {{< var ects >}}"
+---
+
+## Velkommen
+
+På modulet skal vi sammen lære at forstå og anvende principper og praksis inden for design, udvikling og vedligehold af moderne IT-systemer, med særligt fokus på den offentlige sektor.
+
+Undervisningen er centreret omkring programmering i **Python 3**, og I opbygger praktiske færdigheder gennem workshops. I kommer til at arbejde med alt fra grundlæggende programmeringsparadigmer til databaser.
+
+Undervisningen er struktureret progressivt. Vi starter med de fundamentale begreber om computere og algoritmer og fortsætter med teknologier som machine learning, kunstig intelligens og chatbots, og med hvordan de kan bruges i offentlige institutioner.
+
+> Målet er, at I kan stille kvalificerede spørgsmål til teknologien. Det kræver, at I ved, hvad der foregår indeni.
+
+## Modulbeskrivelse
+
+Modulet introducerer jer for grundlæggende computerteknologi og dens rolle og betydning i samfundet. Herunder de fundamentale teknologier og principper, som ligger til grund for moderne IT-systemers design og funktion. Derudover introduceres I til grundlæggende programmering, til software, der ofte bruges, når man programmerer, og til grundlæggende principper for softwaredesign.
+
+## Læringsmål
+
+::: {.panel-tabset}
+### Viden
+
+- Viden om teori, metoder og praksis omkring softwaredesign og -udvikling i forbindelse med digital innovation i den private og offentlige sektor.
+- Viden om teori, metoder og praksis omkring design og programmering af sådanne systemer.
+- Forstå og reflektere over teorier, metoder og praksis i relation til softwareudvikling, fx principper og metoder til grundlæggende softwaredesign, programmering og test.
+
+### Færdigheder
+
+- Anvende grundlæggende principper og metoder til design, programmering og test af software.
+- Vurdere teoretiske og praktiske problemstillinger i forbindelse med design, programmering og test, og foretage relevante og begrundede valg af metoder og løsningsmodeller.
+- Formidle programmeringstekniske problemstillinger og løsningsmodeller til både fagfæller og ikke-specialister, fx formidle de tekniske udfordringer og risici ved forskellige tekniske løsningsmodeller til interessenter med en ikke-teknisk baggrund.
+
+### Kompetencer
+
+- Håndtere teknisk komplekse og udviklingsorienterede situationer, fx beherske principper og metoder til at håndtere den kompleksitet, usikkerhed og grad af tekniske risici, som er karakteristisk for innovative udviklingsprojekter.
+- Selvstændigt indgå i tværfaglige projektgrupper i organisationer, der arbejder med IT-udvikling og digitalisering.
+- Medvirke til læring og forbedring af egen arbejdspraksis i forbindelse med udvikling af IT-systemer, herunder kende forskellige paradigmer for procesevaluering og forbedring inden for IT-udvikling.
+:::
+
+## Sådan arbejder vi
+
+- **Forelæsninger og øvelser.** Hver kursusgang er en blanding af gennemgang og workshop, hvor I selv sidder ved tasterne.
+- **Interaktion og dialog.** Spørg, når noget er uklart. Det er normalt, at det driller.
+- **Gruppearbejde** til workshops. Fra lektion 3 arbejder grupperne i et fælles [mini-projekt](miniprojekt.qmd).
+- **Læs inden forelæsningen.** Litteraturen til hver gang står i [lektionsplanen](plan.qmd).
+
+Omfang og forventet arbejdsindsats fremgår af semesterbeskrivelsen på [Moodle]({{< var moodle >}}).
+
+## Undervisere
+
+- **Jeppe Fjeldgaard Qvist**, modulansvarlig. Kandidat i samfundsfag og geografi og ph.d. fra Institut for Politik og Samfund, postdoc ved Samfund og Politik, AAU. Underviser også på Social Data Science-specialiseringen og forsker i diversitet på arbejdsmarkedet.
+- **Marianne Paasch**, underviser og vejleder.
+
+Kontaktoplysninger står på [Moodle]({{< var moodle >}}).
+
+## Pensum
+
+- Kernighan, B. W. (2021): *Understanding the Digital World: What You Need to Know about Computers, the Internet, Privacy, and Security*, 2. udgave. Princeton University Press. Kan købes hos Faktum.
+- Downey, A. B. (2024): [*Think Python: How to Think Like a Computer Scientist*, 3. udgave]({{< var think-python >}}). O'Reilly Media. Frit tilgængelig online.
+
+Studieordningen for Innovation og Digitalisering, semesterbeskrivelsen og Studienævnet for Politik og Samfund findes via [Moodle]({{< var moodle >}}).

@@ -1,0 +1,214 @@
+---
+title: "Python-workshop"
+subtitle: "Lektion 06"
+author: "Jeppe Fjeldgaard Qvist"
+format: sds1-revealjs
+engine: markdown
+accent: lyseblaa
+---
+
+## I dag
+
+1. **Opsamling på Git.** Ordene fra sidst, branches, `.gitignore`, fetch og pull.
+2. **Workshop.** I arbejder videre med mini-projektet, i jeres egen branch.
+
+# Opsamling på Git
+
+Fire ord, tre værktøjer og én arbejdsgang til i dag.
+
+## Fra fil til GitHub
+
+En ændring flytter sig gennem fire steder. Tryk *Næste trin*, og følg filen.
+
+::: {.figur figur="git" fil="barometer.py" remote="ja"}
+:::
+
+## Ordene fra sidst
+
+| Ord | Hvad det er |
+|-------|-----------------|
+| **Repository** (repo) | Mappen med alle filer og hele versionshistorikken. Lokalt på jeres computer eller *remote* på en server som GitHub. |
+| **Working directory** | Filerne, som I ser og redigerer lige nu. |
+| **Staging area** (index) | Pakkelisten til næste commit. Filer lægges her med `git add` eller **+** i Git-panelet. |
+| **Commit** | Et øjebliksbillede af projektet på et bestemt tidspunkt. Har en unik hash og gemmer ændringer, forfatter, tidspunkt og en besked om, hvad der er ændret. |
+
+## Clone eller fork?
+
+::: {.figur figur="fork" original="jeppeFQ" repo="BID-workshop-projekt"}
+:::
+
+:::: {.to-kol .lille}
+::: {.kol}
+**Clone** henter en komplet kopi ned på *jeres computer*. Typisk det første skridt, når I vil bidrage til et eksisterende projekt.
+:::
+
+::: {.kol}
+**Fork** laver jeres egen kopi *på serveren*, som I kan ændre uden at påvirke originalen. Til jeres egen variant, der går i en anden retning, og til open source, hvor hundredvis kan bidrage uden direkte adgang til originalen.
+:::
+::::
+
+## Branch: en parallel linje
+
+En **[branch]{.ord}** er en parallel udviklingslinje. I kan arbejde på en ny feature eller et eksperiment uden at røre hovedkoden. Tryk *Næste trin*.
+
+::: {.figur figur="branch"}
+:::
+
+::: {.lille}
+`main` (tidligere `master`) er standardgrenen. **[Merge]{.ord}** fletter ændringerne fra én branch ind i en anden.
+:::
+
+## Branch-kommandoerne
+
+| Hvad vil I? | Kommando |
+|---|---|
+| Se alle branches | `git branch` (med `-a` også dem på GitHub) |
+| Lave en ny | `git branch ny-figur` |
+| Skifte til en anden | `git checkout ny-figur` |
+| Lave og skifte i ét | `git checkout -b ny-figur` |
+| Flette en anden ind i den, I står på | `git merge ny-figur` |
+| Slette (kun hvis den er merged) | `git branch -d ny-figur` |
+
+::: {.fragment}
+**Tjek jer selv:** I står på `main` og skriver `git merge ny-figur`. Hvilken branch ændrer sig?
+
+::: {.fragment}
+`main`. Merge fletter altid *ind i* den branch, I står på. `ny-figur` er uændret.
+:::
+:::
+
+## `.gitignore`: det, Git skal se bort fra
+
+:::: {.to-kol}
+::: {.kol}
+`.gitignore` er en almindelig tekstfil i roden af projektet. Hver linje er et **mønster**. Filer, der matcher, bliver hverken tracket eller taget med i versionskontrol.
+
+Lav den i terminalen (eller Git Bash):
+
+```
+touch .gitignore
+```
+:::
+
+::: {.kol}
+**Typisk ting, der ikke hører hjemme i et repository**
+
+- log-filer
+- dependencies
+- konfigurationsfiler
+- backup-filer
+- store datafiler
+:::
+::::
+
+## Mønstrene, ét ad gangen
+
+Tryk *Næste trin*. For hver ny linje i `.gitignore`: hvilke filer forsvinder?
+
+::: {.figur figur="gitignore"}
+:::
+
+## Mønstrene: til at slå op
+
+| Mønster | Betyder |
+|---|---|
+| `*.txt` | alle filer, der ender på `.txt` |
+| `temp/` | mappen `temp` og alt dens indhold |
+| `!important.txt` | track denne fil, selvom den matcher et andet mønster |
+| `/temp/` | `/` i begyndelsen: matcher kun i rod-mappen |
+| `data/**/*.csv` | `**` matcher mapper på alle niveauer |
+
+## For sent til `.gitignore`?
+
+I committede `data/stor.csv` i går. I dag skriver I `data/` i `.gitignore`. Hvad sker der?
+
+::: {.fragment}
+**Ingenting.** `.gitignore` virker kun på filer, Git *ikke* allerede holder øje med (*untracked*). Filen er tracked, så Git bliver ved.
+
+Fjern den først fra Git:
+
+```
+git rm --cached data/stor.csv
+```
+
+`--cached` betyder: fjern filen fra Git, men lad den blive liggende i mappen. Den ligger stadig i de gamle commits.
+:::
+
+## fetch, pull og push
+
+Tre kommandoer, tre retninger. Tryk *Næste trin*.
+
+::: {.figur figur="synk"}
+:::
+
+::: {.lille}
+**fetch** henter ændringer fra GitHub uden at flette dem ind · **pull** henter *og* fletter ind i jeres branch · **push** sender jeres commits op.
+:::
+
+# Workshop
+
+I arbejder videre med mini-projektet. Først Git-opsætningen.
+
+## Workshoppens Git-opsætning
+
+::::: {.trin-kort}
+:::: {.kol}
+0 · Ignorér
+
+Lav en `.gitignore`-fil.
+::::
+
+:::: {.fragment}
+1 · Branch
+
+`git checkout -b …`
+
+Lav (mindst) én branch, og check den ud.
+::::
+
+:::: {.fragment}
+2 · Arbejd
+
+`git push` · `git pull`
+
+Lav dagens arbejde i branchen. Push den løbende til GitHub, og pull/push løbende, hvis I arbejder på flere computere.
+::::
+
+:::: {.fragment}
+3 · Merge
+
+`git merge …`
+
+Merge branchen ind i `main`, *hvis* I føler, at dagens arbejde er færdigt.
+::::
+:::::
+
+::: {.fragment .lille}
+Står I fast? `git status` fortæller altid, hvilken branch I står på, og hvad der er ændret.
+:::
+
+## Sidst i dag {.sidst}
+
+:::: {.kort-raekke}
+::: {.kol}
+**Det vigtigste**
+
+En branch er et sikkert sted at eksperimentere. `.gitignore` holder filer ude. fetch henter, pull henter og fletter ind, push sender op.
+:::
+
+::: {.kol}
+**Øvelser**
+
+Arbejd videre i mini-projektet. Commit og push jeres branch, inden I går.
+:::
+
+::: {.kol}
+**Næste gang**
+
+[Lektion 7: Machine learning og kunstig intelligens](../07-machine-learning-og-ai/index.html). Læs Kernighan (2021), kap. 12.
+:::
+::::
+
+[Tilbage til lektionens side](index.html) · [Alle lektioner](../../kursus/plan.html)
+
+[]{.aau-logo role="img" aria-label="Aalborg Universitet"}

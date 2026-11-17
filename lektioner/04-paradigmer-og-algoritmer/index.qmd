@@ -1,0 +1,40 @@
+---
+title: "Programmeringsparadigmer og algoritmer"
+lektion: 4
+date: 2026-09-30
+description: "Fra hardware til software: maskinkode, høj- og lavniveausprog, abstraktion, computationel tænkning, funktioner og paradigmer."
+workshop: "Mini-projektet: en bestilling fra en kunde"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Kernighan (2021), kap. 6 og 7"
+  - "Downey (2024), kap. 4, 5 og 6"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 08.15–12.00 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Kursusgangen introducerer programmering som disciplin. Hvordan får vi hardwaren til at gøre det, vi gerne vil have den til? Hvilke principper ligger til grund for det, og hvordan har det udviklet sig i takt med den stigende kompleksitet i den hardware, vi har til rådighed? Vi skifter fokus fra hardware til software og introducerer data og algoritmer, maskinkode, høj- og lavniveausprog, funktionel dekomposition, abstraktion og programmeringsparadigmer.
+
+## Workshop
+
+Mini-projektet begynder: en bestilling fra en kunde. I interviewer kunden, deler opgaven op og skriver de første funktioner.
+
+## Forberedelse og litteratur
+
+- Kernighan (2021): *Understanding the Digital World*, kapitel 6 og 7.
+- Downey (2024): *Think Python*, kapitel 4, 5 og 6 (kapitel 1–3 forudsættes).
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).

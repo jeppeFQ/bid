@@ -1,0 +1,38 @@
+---
+title: "Machine learning og kunstig intelligens"
+lektion: 7
+date: 2026-10-07
+description: "Fra regler til eksempler: superviseret og usuperviseret læring, hvordan en maskine \"ser\", og det digitale samfunds skyggesider."
+workshop: "Python-øvelser"
+status: klar        # klar | kommer | anden | moodle
+slides: true
+underviser: "Jeppe Fjeldgaard Qvist"
+litteratur:
+  - "Kernighan (2021), kap. 12"
+---
+
+::: {.lektion-knapper}
+[Åbn slides](slides.html){.primaer}
+
+[Læsevisning](slides.html?view=scroll)
+
+[Alle lektioner](../../kursus/plan.qmd)
+:::
+
+**Underviser:** Jeppe Fjeldgaard Qvist · kl. 12.30–16.15 · tid og sted i CalMoodle
+
+## Om lektionen
+
+Lektionen introducerer machine learning (maskinlæring) som et centralt felt inden for kunstig intelligens. Machine learning handler om computersystemer, der lærer at løse opgaver og træffe beslutninger ud fra data, uden at være eksplicit programmeret til hver enkelt situation. I modsætning til traditionel programmering, hvor systemet følger faste, hårdkodede regler, lærer modellerne at finde mønstre og sammenhænge i træningseksempler. Det gør det muligt at løse problemer, hvor det ville være upraktisk eller umuligt at skrive reglerne op.
+
+## Workshop
+
+En grundlæggende indføring i de to primære slags maskinlæring: superviseret læring, hvor modellen trænes på data med kendte svar, og usuperviseret læring, hvor modellen finder skjulte strukturer og mønstre i data uden svar.
+
+## Forberedelse og litteratur
+
+- Kernighan (2021): *Understanding the Digital World*, kapitel 12.
+
+## Materiale
+
+Øvelsesfiler og eventuelle handouts ligger på [Moodle]({{< var moodle >}}).
